@@ -1,0 +1,1636 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<style>
+			.reveal i{
+				font-family: 'FontAwesome';
+				font-style: normal;
+			}
+			.red{
+				color:rgb(255, 150, 150);
+			}
+			.green{
+				color:rgb(150, 255, 150);
+			}
+			.yellow{
+				color:rgb(255, 255, 123);
+			}
+			.blue{
+				color:rgb(150, 150, 255);
+			}
+
+			.row{
+				display:flex;
+				flex-direction:row;
+				justify-content: space-around;
+			}
+			.box{
+				border:1px solid white;
+				padding:15px;
+				margin:5px;
+				font-size:24pt;
+			}
+			.emph{
+				font-style:italic;
+			}
+			.ul{
+				text-decoration: underline;
+			}
+
+			.small{
+				scale:0.9;
+			}
+
+			.smaller{
+				scale:0.8;
+			}
+
+			.smallest{
+				scale:0.6;
+			}
+
+			textarea::selection{
+				color:black;
+			}
+
+			.smallerfont{
+				font-size:0.8em;
+			}
+
+			.smallestfont{
+				font-size:0.7em;
+			}
+
+			th{
+				color:rgb(150, 255, 150);
+			}
+
+			/* first child of tr */
+			/* tr > *:first-child{
+				color:rgb(150, 255, 150);
+			} */
+
+			tr > *:first-child:not(.learningBased) {
+				color:rgb(150, 255, 150);
+			}
+
+			.learningBased{
+				color:rgb(130, 203, 255);
+				font-weight: 600;
+			}
+
+
+			table{
+				border: 1px solid white;
+				margin:5px;
+			}
+
+			.term{
+				font-family: monospace;
+				background:rgba(255,255,255,0.4);
+				box-shadow: inset 0px 0px 5px white;
+				padding:4px;
+				border-radius:4px;
+				font-size:0.75em;
+			}
+
+			/* make non-first-child td right-aligned */
+			.reveal table tr td:not(:first-child){
+				text-align:right;
+			}
+
+		</style>		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h3>Search Strategy Selection for Automated Theorem Proving</h3>
+					<hr>
+					<h4>Jack McKeown</h4>
+					<h6>Advised by Geoff Sutcliffe</h6>
+				</section>
+
+				<section id="outline">
+					<h3>Outline</h3>
+					<div class="box">
+						<ol>
+							<li class="fragment">First-Order Logic & CNF</li>
+							<li class="fragment">Saturation-based ATP</li>
+							<li class="fragment">Given Clause Selection</li>
+							<li class="fragment">E proof search strategies</li>
+							<li class="fragment">
+								Relevant Previous Work
+								<ul class="small">
+									<li>Enigma-NG</li>
+									<li>TRAIL</li>
+									<li>DeepMind Hindsight Experience Replay</li>
+								</ul>
+							</li>
+							
+							<li class="fragment">Reinforcement Learning
+								<ul class="small">
+									<li class="fragment">Proximal Policy Optimization</li>
+									<li class="fragment">My RL Setup for Given Clause Selection</li>
+								</ul>
+							</li>
+							<li class="fragment">E Strategy Merging</li>
+							<li class="fragment">Conclusion / Future Research</li>
+						</ol>
+					</div>
+				</section>
+
+
+
+
+				<section id="firstOrderLogic">
+					<h3>First Order Logic</h3>
+					<hr>
+					<ul class="small">
+						<li class="fragment"><span class="green">Propositions and Logical Connectives</span> <br>(from propositional logic)<br><br></li>
+						<li class="fragment"><span class="green">Variables</span></li>
+						<li class="fragment"><span class="green">Functions</span> (which produce non-booleans)</li>
+						<li class="fragment"><span class="green">Predicates</span> (which produce booleans)</li>
+					</ul>
+				</section>
+
+				<section id="clauseNormalForm">
+					<h3>Clause Normal Form</h3>
+					<div class="box">
+						This first order statement: 
+						<span class="red">
+							$$ \forall X \exists Y : p(X,f(Y)) \; \vee \; (q(X)\wedge q(Y))$$
+						</span>
+						<span class="fragment">
+							becomes
+							<span class="green">
+								$$ \underbrace{p(X, f(sk(X))) \; \vee \; q(X)}_{clause} \;\; \bigwedge \;\; \underbrace{p(X, f(sk(X))) \; \vee \;q(sk(X))}_{clause} $$
+							</span>
+							in Conjunctive/Clause Normal Form (CNF).<br>
+							(All variables are universally quantified.)
+						</span>
+					</div>
+				</section>
+
+				<section id="saturation">
+					<h3>Saturation</h3>
+					<ul class="smallerfont">
+						<li class="fragment">
+							Prove conjecture $C$ from Axioms by showing that <br>
+							&nbsp;&nbsp;&nbsp;&nbsp;<span class="green">CNF(Axioms $\cup$ $\{\sim C\}$)</span><br> is unsatisfiable
+						</li>
+						<li class="fragment"><span class="green">Saturation:</span> Compute the closure with sound inference rules</li>
+						<li class="fragment">Show unsatisfiability by inferring the empty clause via saturation</li>
+						<!-- <li class="fragment smaller green">(Intuition: the empty clause must be false because if the empty clause were true, then every clause would need to be as well: <br>$empty | false \equiv false$)</li> -->
+					</ul>
+
+				</section>
+
+				<section id="givenClauseSelection">
+					<h3>Given Clause Selection</h3>
+					<img src="images/processedAndUnprocessedSets7.svg" style="background:white">
+					<ul>
+						<li style="font-size: 0.7em;">Improving given clause selection is a core goal of ATP research</li>
+					</ul>
+				</section>
+
+				<section id="eprover">
+					<h4>The E Theorem Prover</h4>
+					<ul class="smallerfont">
+						<li class="fragment">
+							Saturation-based prover for full first-order logic with equality
+							<ul>
+								<li class="fragment">Now with full higher-order support!</li>
+							</ul>
+						</li>
+						<li class="fragment">High-performance
+							<ul>
+								<li class="fragment">Written in C</li>
+								<li class="fragment">Careful management of resources</li>
+							</ul>
+						</li>
+						<li class="fragment">Can automatically select guidance strategies:
+							<ul>
+								<li class="fragment smallerfont"> <span class="term">--auto</span></li>
+								<li class="fragment smallerfont"> <span class="term">--auto-schedule</span></li>
+							</ul>
+						</li>
+						<li class="fragment">Developed by Stephan Schulz (thank you 🙏)</li>
+					</ul>
+
+				</section>
+
+				<section id="eQueues">
+					<h4>Given Clause Selection Queues in E</h4>
+					<style>
+						.Equeue{
+							display: flex;
+							padding: 0.3em;
+							width:   100%;
+							align-items: center;
+						}
+						.Eclause{
+							width:  0.8em;
+							height: 0.8em;
+							margin: 0.1em 0.2em;
+							align-items: center;
+							display: flex;
+							justify-content: center;
+						}
+					</style>
+					<div class="Equeue box">
+						<div class="Eclause"> $\leftarrow$</div>
+						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+						<div class="Eclause">$...$</div>
+						<div style="width:2em;"></div>
+						<div class="smallerfont">10*Clauseweight(PreferGoals,1,1,1)</div>
+					</div>
+
+					<div class="Equeue box">
+						<div class="Eclause"> $\leftarrow$</div>
+						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+						<div class="Eclause">$...$</div>
+						<div style="width:2em;"></div>
+						<div class="smallerfont">10*Clauseweight(PreferNonGoals,1,1,1)
+						</div>
+					</div>
+
+					<div class="Equeue box">
+						<div class="Eclause"> $\leftarrow$</div>
+						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+						<div class="Eclause">$...$</div>
+						<div style="width:2em;"></div>
+						<div class="smallerfont">10*Clauseweight(ByHornDist,1,1,1)</div>
+					</div>
+
+					$\vdots$
+
+
+					<div class="Equeue box">
+						<div class="Eclause"> $\leftarrow$</div>
+						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+						<div class="Eclause">$...$</div>
+						<div style="width:2em;"></div>
+						<div class="smallerfont">1*FIFOWeight(ConstPrio)</div>
+					</div>
+
+					<textarea  cols="50" rows="8" style="overflow: hidden;">
+Example Heuristic in E:
+(fixed for a proof attempt)
+
+10 * Clauseweight(PreferGoals,1,1,1),
+10 * Clauseweight(PreferNonGoals,1,1,1),
+10 * Clauseweight(ByHornDist,1,1,1),
+...
+1 * FIFOWeight(ConstPrio)
+					</textarea>
+
+				</section>
+
+
+
+
+
+
+
+				<section id="gcsSupervisedLearning">
+					<h3>GCS as Supervised Learning</h3>
+					<ul class="smallerfont">
+						<li class="fragment">Learn a function to evaluate clauses: <span class="green">$f_\theta(clause, context) \rightarrow score$</span></li>
+						<li class="fragment">Clause representation is linked with model architecture</li>
+						<li class="fragment"><span class="green">$f$</span> 
+							is trained as a classifier using successful proofs:
+							<ul>
+								<li class="fragment"><span class="green">positive examples:</span> proof clause selections.</li>
+								<li class="fragment"><span class="red">negative examples:</span> all other clause selections</li>
+							</ul>
+						</li>
+						<div class="box fragment" style="padding-left:2em;margin-left:-2em;">
+							<h4 style="margin-bottom:0px">Drawbacks</h4>
+							<li class="fragment red">Usually relies on consistent signature</li>
+							<li class="fragment red">Highly unbalanced training data <br>(most selected clauses aren't in the proof)</li>
+						</div>
+					</ul>
+				</section>
+
+
+				<section id="prevWork">
+
+					<section id="enigma">
+						<h4>Previous Work: <span class="green">ENIGMA</span></h4>
+						<div class="row">
+							<ul style="font-size:0.7em;width:100%;">
+								<br>
+								<li class="fragment">Clause features count tree walks</li>
+								<li class="fragment">Feature hashing</li>
+								<li class="fragment">Negated conjecture context<hr></li>
+								<li class="fragment">Clause evaluation from classifier probability</li>
+								<li class="fragment">Compared with a <span class="green">Recursive</span> Neural Network</li>
+								<li class="fragment">
+									<span>XGBoost</span>
+									<span class="fragment"><span class="green">&gt;</span> LibLinear</span>
+									<span class="fragment"><span class="green">&gt;</span> NN</span>
+									<span class="fragment"><span class="green">&gt;</span> baseline</span>
+								</li>
+							</ul>
+							<div class="smallerfont">
+								<img src="images/clauseGraph.png" style="height:250px">
+								<span class="green smallerfont">$p(X,f(sk(X),g(b),g(Y)))$</span>
+							</div>
+						</div>
+						<aside class="notes">
+							
+						</aside>
+					</section>
+
+					<!--  -->
+
+					<section id="trail">
+						<h4>Previous Work: <span class="green">TRAIL</span></h4>
+						<div class="row"></div>
+						<ul class="smallerfont">
+							<li class="fragment">Efficient vectorization as in ENIGMA</li>
+							<li class="fragment">Full processed set context</li>
+							<li class="fragment">First saturation-based RL method</li>
+							<li class="fragment">Each context clause votes on its "favorite" unprocessed clause</li>
+							<li class="fragment">Substantially improved base prover performance (Beagle)</li>
+							<li class="fragment">Close to E <span class="term">--auto</span> performance</li>
+						</ul>
+						<aside class="notes">
+							
+						</aside>
+					</section>
+
+					<!--  -->
+
+					<section id="hindsightExperienceReplay">
+						<h4>Previous Work: <span class="green">Hindsight Experience Replay</span></h4>
+						<ul class="smallerfont">
+							<li class="fragment">Another "in-proofness" classifier CEF</li>
+							<li class="fragment">Hindsight Experience Replay (DeepMind - 2017)</li>
+							<li class="fragment">Provides extra training data using "hindsight goals":
+								<ul>
+									<li class="fragment">Failed to saturate <span class="green">$CNF(Ax \cup \{\sim C\})$</span></li>
+									<li class="fragment">Create a synthetic problem <span class="green">$CNF(Ax \cup \{\sim C, \sim D\})$</span> from any clause <span class="green">$D$</span> derived during the attempt</li>
+								</ul>
+							</li>
+							<li class="fragment">Transformer network with graph laplacian positional embeddings</li>
+							<li class="fragment">Beats E's <span class="term">--auto</span> mode and even <span class="term">--auto-schedule</span>!</li>
+						</ul>
+						<aside class="notes">
+							
+						</aside>
+					</section>
+				</section>
+
+
+
+				<section id="basicIdea">
+					<h3>General Idea of My Research</h3>
+					<ul class="smallerfont">
+						<li class="fragment">Use reinforcement learning to learn a policy that
+							<ul>
+								<li class="fragment">dynamically decides which queue (CEF) to use</li>
+								<li class="fragment">based on efficiently tracked state within E</li>
+							</ul>
+						</li>
+						<li class="fragment">E &nbsp;&nbsp;<span class="green">$\leftarrow$named pipes$\rightarrow$</span>&nbsp;&nbsp; PyTorch</li>
+						<li class="fragment green">Sidesteps clause representation</li>
+						<li class="fragment green">Little overhead compared to neural clause evaluation</li>
+					</ul>
+
+					<textarea class="fragment" cols="50" rows="8" style="overflow: hidden;">
+Example Heuristic in E:
+(fixed for a proof attempt)
+
+10 * Clauseweight(PreferGoals,1,1,1),
+10 * Clauseweight(PreferNonGoals,1,1,1),
+10 * Clauseweight(ByHornDist,1,1,1),
+1 * FIFOWeight(ConstPrio)
+...
+												
+					</textarea>
+					<textarea class="fragment" cols="50" rows="8" style="overflow: hidden;">
+Example "heuristic" in RL mode 
+(probabilities change during proof attempt):
+
+0.5 * Clauseweight(PreferGoals,1,1,1),
+0.2 * Clauseweight(PreferNonGoals,1,1,1),
+0.1 * Clauseweight(ByHornDist,1,1,1),
+0.1 * FIFOWeight(ConstPrio),
+...
+					</textarea>
+				</section>
+
+
+				<section id="RL">
+					<section>
+						<h3>RL / Policy Gradients Background</h3>
+						<ul style="font-size: 0.7em;">
+							<li class="fragment">States, Actions and Rewards</li>
+							<li class="fragment" style="line-height: 1.9em;">Policy:
+								<span class="green fragment">$\pi(s) = a$</span> <span class="fragment">&nbsp;&nbsp;OR&nbsp;&nbsp;</span>
+								<span class="green fragment">$\sum_a \pi(s,a) = 1$</span>
+							</li>
+							<li class="fragment">Goal: <span class="green">Maximize expected future discounted
+									rewards</span></li>
+							<li class="fragment" style="line-height: 2.1em;">Policy Gradient Loss:
+								$\displaystyle\frac{1}{T}\sum_{t=1}^T [$
+								<span class="green fragment"
+									style="padding:1em 0em;font-size:0.8em;">$-\log{(\pi(s_t,a_t))}$</span>
+								<span class="fragment">
+									$\cdot $
+									<span class="blue">$R_t$</span>
+								</span>
+								$]$
+							</li>
+	
+	
+							<li class="fragment" style="line-height: 2.1em;">Reducing Variance:
+								$\displaystyle\frac{1}{T}\sum_{t=1}^T [$
+								<span class="green"
+									style="padding:1em 0em;font-size:0.8em;">$-\log{(\pi(s_t,a_t))}$</span>
+								<span>
+									$\cdot $
+									<span class="red">$A_t$</span>
+								</span>
+								$]$
+							</li>
+							<li class="fragment">
+								<span class="red">
+									$A_t$
+								</span>
+								$=$
+								<span class="blue">$R_t$</span> $- V(s_t)$
+							</li>
+						</ul>
+	
+						<aside class="notes">
+							+ taking actions from states to obtain rewards.
+							+ PG Loss is negative log likelihood of actions times future rewards.
+							+ Subtracting baseline can help reduce the PG variance without changing the expected value.
+							+ This is called Actor-critic where the actor is the policy and the critic is the learned baseline.
+						</aside>
+					</section>
+	
+					<section>
+						<h3>Proximal Policy Optimization (PPO)</h3>
+						<ul style="font-size:0.7em;">
+							<!-- <li class="fragment">Simpler successor to Trust Region Policy Optimization (TRPO)</li> -->
+							<li class="fragment">Main Idea: <span class="green">Learn from the same data multiple times in
+									mini-batches <br>without drastically affecting the current policy.</span></li>
+							<span class="fragment">
+								<li>A special loss limits the gradient so that 
+									<span class="green">$0.8\pi_{old}(s,a) \leq \pi(s,a) \leq 1.2\pi_{old}(s,a)$</span>
+								</li>
+								<ul>
+									<li>$r_t(\theta) = \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{old}}(a_t |
+										s_t)}$</li>
+									<li>$L_{actor}(\theta) = \displaystyle\frac{1}{T}\sum_{t=1}^T [min($ 
+										<span class="green">$r_t(\theta)A_t$</span> $, $ 
+										<span class="red">$clip(r_t(\theta),1-\epsilon, 1+\epsilon)A_t$</span> $)]$
+									</li>
+								</ul>
+							</span>
+						</ul>
+						<aside class="notes">
+							+ PPO makes multiple mini-batch gradient steps from a batch of episodes.
+							+ This has potential to be problematic if the policy changes too much as the data is no longer representative.
+							+ PPO limits the magnitude of the overall policy change.
+						</aside>
+					</section>
+				</section>
+
+
+
+				<section id="ReinforcementLearning">
+
+					<section>
+						<h3>RL State in E</h3>
+						<ul class="small">
+							<li>
+								<span>
+									$($
+									<span class="green">$t$</span>,
+									<span class="green">$|P|$</span>,
+									<span class="green">$|U|$</span>,
+									<span class="green">$W(P)$</span>,
+									<span class="green">$W(U)$</span>
+									$)$
+								</span>
+							</li>
+							<hr>
+							<li class="fragment smallerfont"><span class="green">$t$</span> - Number of clause selections performed so far</li>
+							<li class="fragment smallerfont"><span class="green">$|P|$</span> - Number of clauses in the processed set</li>
+							<li class="fragment smallerfont"><span class="green">$|U|$</span> - Number of clauses in the unprocessed set</li>
+							<li class="fragment smallerfont"><span class="green">$W(P)$</span> - Average weight of the clauses in the processed set</li>
+							<li class="fragment smallerfont"><span class="green">$W(U)$</span> - Average weight of the clauses in the unprocessed set</li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>RL Actions in E / Strategy Curation</h3>
+						<ul class="small">
+							<li class="fragment smallerfont">Choice from a <span class="green">fixed set</span> of CEFs<hr></li>
+
+							<li class="fragment smallerfont">To determine this <span class="green">fixed set for each dataset:</span>
+								<ul>
+									<li class="fragment">Run E with <span class="term">--auto --print-strategy</span> on all problems</li>
+									<li class="fragment">Merge these strategies into one <span class="green">master strategy</span>
+										<ul>
+											<li class="fragment" style="font-size:0.95em;">Most <span class="green">strategy</span> components set to their most common value</li>
+											<li class="fragment" style="font-size:0.95em;">Every CEF is included in the <span class="green">master strategy</span> heuristic</li>
+											<li class="fragment" style="font-size:0.95em;">Heuristic weights set intuitively $\rightarrow$ <span class="green">MasterWeighted</li>
+											<li class="fragment" style="font-size:0.95em;">Heuristic weights set to <span class="green">1</span> $\rightarrow$ <span class="green">MasterAllOnes</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li class="fragment smallerfont"><hr>~40 CEFs for each dataset</li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>RL Rewards in E</h3>
+						<ul class="small">
+							<li class="fragment"><span class="red">0</span> for selection of non-proof clauses</li>
+							<li class="fragment"><span class="green">$\frac{1}{n}$</span> for selection of proof clauses
+								<span class="smallestfont"><br>(where <span class="green">$n$</span> is the number of proof clauses)</span>
+							</li>
+							<li class="fragment"><hr>Rewards calculated after proof attempt
+								<ul class="smallestfont"><li>Custom PPO implementation 😕</li></ul>
+							</li>
+						</ul>
+					</section>
+	
+				</section>
+
+				<section id="experimentalSetup">
+					<section>
+						<h3>Training Architecture</h3>
+						<img src="images/training_architecture.svg" style="background:rgba(255,255,255,0.8)">
+					</section>
+
+					<section>
+						<h3>Testing Architecture</h3>
+						<img src="images/testing_architecture.svg" style="background:rgba(255,255,255,0.8)">
+					</section>
+	
+					<section>
+						<h3>Approaches Compared</h3>
+						<ul style="font-size:0.7em;">
+							<li class="fragment" style="margin-bottom:10px;line-height:1.3em;">
+								<span class="green term" style="text-decoration:underline">--auto</span>:
+								<span class="smallfont">E's best strategy <span class="yellow">(other than <span class="term">--auto-schedule</span>)</span></span>
+							</li>
+							<li class="fragment" style="margin-bottom:10px;line-height:1.3em;">
+								<span class="green" style="text-decoration:underline">MasterWeighted / MasterAllOnes</span>:
+								<span class="smallfont"> 
+									<br><span class="yellow">(Derived from <span class="term">--auto</span> over that dataset)</span>
+								</span>
+							</li>
+
+
+
+							<li class="fragment" style="margin-bottom:10px;line-height:1.3em;">
+								<span class="blue" style="text-decoration:underline">Constant Categorical</span>:
+								<span class="smallfont">
+									Randomly samples CEF from a learned distribution
+									<br><span class="yellow">(Ignores RL State)</span>
+								</span>
+							</li>
+							<li class="fragment" style="margin-bottom:10px;line-height:1.3em;">
+								<span class="green" style="text-decoration:underline">Distilled Categorical</span>:
+								<span class="smallfont">
+									ConstCat reduced to a standard E heuristic.
+									<br><span class="yellow">(Removes randomness and overhead)</span>
+								</span>
+							</li>
+
+							<li class="fragment" style="margin-bottom:10px;line-height:1.3em;">
+								<span class="blue" style="text-decoration:underline">Neural Network</span>:
+								<span class="smallfont">A shallow neural network policy</span>
+							</li>
+
+						</ul>
+					</section>
+
+					<section>
+						<h3>Datasets</h3>
+						<ul style="font-size:0.7em;">
+							<li class="fragment"><span class="green">MPTPTP2078</span> - Small First Order Problems
+								<ul>
+									<li class="fragment">Mizar Mathematical Library</li>
+								</ul>
+							</li>
+							<br>
+							<li class="fragment"><span class="green">VBT</span> - Big Typed First Order Problems
+								<ul>
+									<li class="fragment">Used in CASCJ11</li>
+									<li class="fragment"><em style="text-decoration: underline;">van Emde Boas Trees</em> entry in Isabelle's Archive of Formal Proofs (AFP)</li>
+								</ul>
+							</li>
+							<br>
+							<li class="fragment"><span class="green">SLH-29</span> - Higher Order Problems
+								<ul>
+									<li class="fragment">Used in CASCJ11</li>
+									<li class="fragment">From Isabelle's Sledgehammer mode</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+	
+					<section>
+						<h3>Experiment Details</h3>
+						<ul style="font-size:0.7em;">
+							<li class="fragment"><span class="green">Soft CPU limit</span> for non-learning methods: <span class="blue">60 seconds</span></li>
+							<li class="fragment"><span class="green">Soft CPU limit</span> for learning methods: <span class="blue">75 seconds</span>
+								<ul>
+									<li class="fragment">This was done to account for named pipe communication latency</li>
+								</ul>
+							</li>
+							<li class="fragment"><span class="red">Hard CPU limit</span> = <span class="green">Soft CPU limit</span> + <span class="blue">5 seconds</span></li>
+						</ul>
+					</section>
+				</section>
+
+				<section id="summarizedResults">
+					<section id="solvedTables">
+						<h3>Number of Problems Solved</h3>
+						<div class="row">
+
+							<table style="font-size:0.4em;">
+								<tr><th></th><th></th><th>MPTPTP2078</th></tr>
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<th>Run</th>                                                                                                                                                                                                                                                                                                               
+								<th>Solved</th>                                                                                                                                                                                                                                                                                                            
+								<th>vs Auto</th>                                                                                                                                                                                                                                                                                                    
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+								<td>1232</td>                                                                                                                                                                                                                                                                                                              
+								<td>+125 , -44</td>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
+								<td>1229</td>                                                                                                                                                                                                                                                                                                              
+								<td>+125 , -47</td>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
+								<td>1226</td>                                                                                                                                                                                                                                                                                                              
+								<td>+124 , -49</td>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+								<td>1219</td>                                                                                                                                                                                                                                                                                                              
+								<td>+115 , -47</td>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+								<td>1210</td>                                                                                                                                                                                                                                                                                                              
+								<td>+113 , -54</td>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>Auto</td>                                                                                                                                                                                                                                                                                                           
+								<td>1151</td>                                                                                                                                                                                                                                                                                                              
+								<td>+0 , -0</td>                                                                                                                                                                                                                                                                                                           
+								</tr>                                                                                                                                                                                                                                                                                                                      
+							</table>
+							<table style="font-size:0.4em;">
+								<tr><th></th><th></th><th>VBT</th></tr>
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<th>Run</th>                                                                                                                                                                                                                                                                                                               
+								<th>Solved</th>                                                                                                                                                                                                                                                                                                            
+								<th>vs Auto</th>                                                                                                                                                                                                                                                                                                    
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
+								<td>3046</td>                                                                                                                                                                                                                                                                                                              
+								<td>+474 , -65</td>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
+								<td>2916</td>                                                                                                                                                                                                                                                                                                              
+								<td>+379 , -100</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+								<td>2841</td>                                                                                                                                                                                                                                                                                                              
+								<td>+269 , -65</td>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+								<td>2804</td>                                                                                                                                                                                                                                                                                                              
+								<td>+285 , -118</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+								<td>2701</td>                                                                                                                                                                                                                                                                                                              
+								<td>+215 , -151</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                  
+								<td>Auto</td>                                                                                                                                                                                                                                                                                                           
+								<td>2637</td>                                                                                                                                                                                                                                                                                                              
+								<td>+0 , -0</td>                                                                                                                                                                                                                                                                                                           
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								</table>         
+						</div><br>
+						<div class="row">
+							<table style="font-size:0.4em;">
+								<tr><th></th><th></th><th>SLH-29</th></tr>
+								<tr>
+									<th>Run</th>
+									<th>Solved</th>
+									<th>vs Auto</th>
+								</tr>
+								<tr>
+									<td>MasterWeighted</td>
+									<td>3743</td>
+									<td>+493 , -146</td>
+								</tr>
+								<tr>
+									<td>ConstCatDistilled</td>
+									<td>3728</td>
+									<td>+500 , -168</td>
+								</tr>
+								<tr>
+									<td class="learningBased">NeuralNet</td>
+									<td>3676</td>
+									<td>+473 , -193</td>
+								</tr>
+								<tr>
+									<td class="learningBased">ConstCat</td>
+									<td>3676</td>
+									<td>+469 , -189</td>
+								</tr>
+								<tr>
+									<td>MasterAllOnes</td>
+									<td>3642</td>
+									<td>+457 , -211</td>
+								</tr>
+								<tr>
+									<td>Auto</td>
+									<td>3396</td>
+									<td>+0 , -0</td>
+								</tr>
+							</table>
+							<ul class="smallestfont" style="width:47%;margin-left:4%;">
+								<li class="fragment smallerfont">Strategy selection is most important</li>
+								<li class="fragment smallerfont">Best results on <span class="green">MPTPTP2078</span>
+									<ul>
+										<li class="fragment">Successfully learned to find proofs</li>
+									</ul>
+								</li>
+								<li class="fragment smallerfont">Promising as part of a portfolio<br> 
+									<ul>
+										<li><span class="term">--auto-schedule</span></li>
+									</ul>
+									
+								</li>
+							</ul>
+						</div>
+                 
+
+					</section>
+					
+					
+					<section id="processedTables">
+						<h3>Number of Given Clauses</h3>
+						<div class="row">
+
+							<table style="font-size:0.4em;">
+							<tr><th></th><th></th><th>MPTPTP2078</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Given Clauses</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>106.00</td>
+								<td>-3590.75</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>108.00</td>
+								<td>-3564.56</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>111.00</td>
+								<td>-3623.32</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>130.00</td>
+								<td>-3182.97</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>131.00</td>
+								<td>0.00</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>138.00</td>
+								<td>-3433.95</td>
+								</tr>
+							</table>
+							<table style="font-size:0.4em;">
+							<tr><th></th><th></th><th>VBT</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Given Clauses</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>1535.00</td>
+								<td>-519.26</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>1565.50</td>
+								<td>-596.00</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>1566.00</td>
+								<td>-593.85</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>1646.00</td>
+								<td>-516.44</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>1722.00</td>
+								<td>-422.24</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>1927.00</td>
+								<td>0.00</td>
+								</tr>
+							</table>
+						</div><br>
+
+						<div class="row">
+							<table style="font-size:0.4em;">
+								<tr><th></th><th></th><th>SLH-29</th></tr>
+	
+								<tr>
+								<th>Run</th>
+								<th>Given Clauses</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>811.50</td>
+								<td>-2247.36</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>879.00</td>
+								<td>-1778.16</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>939.00</td>
+								<td>-1710.15</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>940.50</td>
+								<td>-1768.82</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>946.00</td>
+								<td>-1731.68</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>1548.00</td>
+								<td>0.00</td>
+								</tr>
+							</table>
+							
+							<ul class="smallestfont" style="width:47%;margin-left:4%;">
+								<li class="fragment smallerfont">Learning-based approaches require fewer given clauses for <span class="green">MPTPTP2078</span></li>
+								<li class="fragment smallerfont">Fewer given clauses required by <em>all</em> methods for <span class="green">MPTPTP2078</span></li>
+								<li class="fragment smallerfont">Indicates intelligent proof search! 🎉</li>
+							</ul>
+						</div>
+
+					</section>
+					
+					
+					<section id="generatedTables">
+						<h3>Number of Generated Clauses</h3>
+						<div class="row">
+                                                                                                                                                                                                                                                                                                                           
+
+							<table style="font-size:0.4em;">
+							<tr><th></th><th></th><th>MPTPTP2078</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Generated</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>195.00</td>
+								<td>-41430.33</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>199.50</td>
+								<td>-40210.44</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>202.00</td>
+								<td>-39402.15</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>230.00</td>
+								<td>-37017.26</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>254.00</td>
+								<td>0.00</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>306.00</td>
+								<td>-40216.47</td>
+								</tr>
+							</table>
+							<table style="font-size:0.4em;">
+							<tr><th></th><th></th><th>VBT</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Generated</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>4752.00</td>
+								<td>1957.39</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>4767.00</td>
+								<td>-2306.29</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>4805.00</td>
+								<td>-865.66</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>5317.00</td>
+								<td>668.75</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>6764.50</td>
+								<td>-1.01</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>8783.00</td>
+								<td>0.00</td>
+								</tr>
+							</table>
+						</div><br>
+
+						<div class="row">
+							<table style="font-size:0.4em;">  
+								<tr><th></th><th></th><th>SLH-29</th></tr>
+	
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<th>Run</th>                                                                                                                                                                                                                                                                                                               
+								<th>Generated</th>                                                                                                                                                                                                                                                                                                         
+								<th>vs Auto</th>                                                                                                                                                                                                                                                                                                 
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+								<td>1651.00</td>                                                                                                                                                                                                                                                                                                           
+								<td>-31346.46</td>                                                                                                                                                                                                                                                                                                         
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+								<td>1814.50</td>                                                                                                                                                                                                                                                                                                           
+								<td>-23891.08</td>                                                                                                                                                                                                                                                                                                         
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+								<td>1868.00</td>                                                                                                                                                                                                                                                                                                           
+								<td>-22696.30</td>                                                                                                                                                                                                                                                                                                         
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>1913.50</td>
+								<td>-23089.69</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>1955.00</td>
+								<td>-20843.68</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>3930.00</td>
+								<td>0.00</td>
+								</tr>
+							</table>
+
+							<ul class="smallestfont" style="width:47%;margin-left:4%;">
+								<li class="fragment">Fewer generated clauses by <em>all</em> methods for <span class="green">MPTPTP2078</span>
+									<ul class="fragment smallerfont">
+										<li class="fragment">Guidance via CEF selection is more reasonable with a smaller unprocessed set</li>
+									</ul>
+								</li>
+									
+							</ul>
+						</div>
+
+
+					</section>
+
+					<section id="proofClauseTables">
+						<h3>Proof Sizes</h3>
+						<div class="row">
+
+
+							<table style="font-size:0.4em;">
+							<tr><th></th><th></th><th>MPTPTP2078</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Proof Clauses</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>23.00</td>
+								<td>0.00</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>26.00</td>
+								<td>0.54</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>26.00</td>
+								<td>0.64</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>26.00</td>
+								<td>0.68</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>26.00</td>
+								<td>0.73</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>26.00</td>
+								<td>0.73</td>
+								</tr>
+							</table>
+							<table style="font-size:0.4em;">
+							<tr><th></th><th></th><th>VBT</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Proof Clauses</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>12.00</td>
+								<td>-0.22</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>12.00</td>
+								<td>-0.19</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>12.00</td>
+								<td>-0.12</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>12.00</td>
+								<td>-0.10</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>13.00</td>
+								<td>0.00</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>13.00</td>
+								<td>0.30</td>
+								</tr>
+							</table>
+						</div><br>
+
+						<div class="row">
+							<table style="font-size:0.4em;">
+								<tr><th></th><th></th><th>SLH-29</th></tr>
+								<tr>
+								<th>Run</th>
+								<th>Proof Clauses</th>
+								<th>vs Auto</th>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>11.00</td>
+								<td>0.00</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>11.00</td>
+								<td>0.08</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>11.00</td>
+								<td>0.47</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>11.00</td>
+								<td>0.56</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>11.00</td>
+								<td>0.60</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>11.00</td>
+								<td>0.75</td>
+								</tr>
+							</table>
+
+							<ul class="smallestfont" style="width:47%;margin-left:4%;">
+								<li class="fragment">More proof clauses $\rightarrow$ more feedback for learning</li>
+							</ul>
+						</div>
+							
+					</section>
+
+					<section id="efficiencyTables">
+						<h6 class="smallerfont">Efficiency (proof clauses / Given Clauses)</h6>
+						<div class="row">
+							<table style="font-size:0.4em;">
+							<tr><th></th><th>MPTPTP2078</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Efficiency</th>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>0.2803</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>0.2770</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>0.2699</td>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>0.2373</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>0.2264</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>0.1926</td>
+								</tr>
+							</table>
+
+							<table style="font-size:0.4em;">
+							<tr><th></th><th>VBT</th></tr>
+
+								<tr>
+								<th>Run</th>
+								<th>Efficiency</th>
+								</tr>
+								<tr>
+								<td>MasterWeighted</td>
+								<td>0.0113</td>
+								</tr>
+								<tr>
+								<td>MasterAllOnes</td>
+								<td>0.0111</td>
+								</tr>
+								<tr>
+								<td>ConstCatDistilled</td>
+								<td>0.0109</td>
+								</tr>
+								<tr>
+								<td class="learningBased">ConstCat</td>
+								<td>0.0108</td>
+								</tr>
+								<tr>
+								<td class="learningBased">NeuralNet</td>
+								<td>0.0099</td>
+								</tr>
+								<tr>
+								<td>Auto</td>
+								<td>0.0091</td>
+								</tr>
+							</table>
+						</div><br>
+
+						<div class="row">
+							<table style="font-size:0.4em;">   
+								<tr><th></th><th>SLH-29</th></tr>
+	
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<th>Run</th>                                                                                                                                                                                                                                                                                                               
+								<th>Efficiency</th>                                                                                                                                                                                                                                                                                                        
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+								<td>0.0181</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
+								<td>0.0178</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+								<td>0.0170</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+								<td>0.0166</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
+								<td>0.0166</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>                                                                                                                                                                                                                                                                                                                       
+								<td>Auto</td>                                                                                                                                                                                                                                                                                                           
+								<td>0.0095</td>                                                                                                                                                                                                                                                                                                       
+								</tr>                                                                                                                                                                                                                                                                                                                      
+							</table> 
+							<ul class="smallestfont" style="width:47%;margin-left:4%;">
+								<li class="fragment">~2% for <span class="green">VBT</span> and <span class="green">SLH-29</span></li>
+								<li class="fragment">~20% for <span class="green">MPTPTP2078</span></li>
+							</ul>
+						</div>
+
+					</section>
+
+
+					<section id="resultSummary">
+						<h3>Summary of Results</h3>
+						<ul class="smallerfont">
+							<li class="fragment">The biggest impact on problems solved was the "strategy aggregation" done to determine the set of actions (CEFs)</li>
+							<li class="fragment"><span class="green">NeuralNet</span> failed to beat <span class="green">ConstCat</span>
+								<ul class="smallerfont">
+									<li class="fragment">The state is not very helpful</li>
+								</ul>
+							</li>
+							<li class="fragment">Learning was most effective for <span class="red">MPTPTP2078</span>
+								<ul class="smallerfont">
+									<li class="fragment">Because proofs are found in fewer given clause selections?</li>
+								</ul>
+							</li>
+							<li class="fragment"><span class="green">Distilled ConstCat</span> beats <span class="green">ConstCat</span> and <span class="green">NeuralNet</span> on <span class="red">SLH-29</span> and <span class="red">VBT</span>, but not <span class="red">MPTPTP2078</span></li>
+							<li class="fragment"><span class="green">MasterWeighted</span> beats everything for <span class="red">SLH-29</span></li>
+
+						</ul>
+					</section>
+
+					<section id="policyVisConstCat">
+						<h3>Policy Visualization for ConstCat</h3>
+						<div class="row">
+							<img src="images/MPTConstCat0_MPT0557+1.p.png" style="max-width:45%">
+							<img src="images/MPTConstCat1_MPT1539+1.p.png" style="max-width:45%">
+						</div>
+					</section>
+
+					<section id="policyVisNeuralNet">
+						<h3>Policy Visualization for NeuralNet</h3>
+						<div class="row">
+							<img src="images/MPTNN0_MPT0557+1.p.png" style="max-width:36%;">
+							<img src="images/MPTNN0_MPT1592+1.p.png" style="max-width:36%;">
+						</div>
+						<div class="row">
+							<img src="images/MPTNN1_MPT1539+1.p.png" style="max-width:36%;">
+							<img src="images/MPTNN1_MPT1964+1.p.png" style="max-width:36%;">
+						</div>
+					</section>
+
+				</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				<section>
+					<section>
+						<h3>🎉 Strategy Merging Works! 🎉</h3>
+					</section>
+
+					<section>
+						<h3>Basic Merging Methods</h3>
+						<ol>
+							<li class="fragment"><span class="green">MasterAllOnes</span> - <span class="smallestfont">Heuristic weights, $h_i := 1$</span></li>
+							<li class="fragment"><span class="green">MasterWeighted</span> - <span class="smallestfont">Heuristic weights, $h_i := ceil(\frac{20\cdot s_i}{\max_j(s_j)})$ where $s_i$ is the sum of heuristic weights for CEF $i$ in the <span class="term">--auto</span> strategies </span></li>
+							<li class="fragment"><span class="green">MasterWeightedRR</span> - <span class="smallestfont">Like MasterWeighted but <br> 
+								<span class="fragment">
+									3*<span class="red">CEF1</span>, 1*<span class="green">CEF2</span>, 2*<span class="blue">CEF3</span>
+									$\rightarrow$ <span class="red">1</span>,<span class="red">1</span>,<span class="red">1</span>,<span class="green">2</span>,<span class="blue">3</span>,<span class="blue">3</span>,...<br>
+								</span>
+								<span class="fragment">becomes <br></span>
+								<span class="fragment">
+									3*<span class="red">CEF1</span>, 1*<span class="green">CEF2</span>, 2*<span class="blue">CEF3</span>
+									$\rightarrow$ <span class="red">1</span>,<span class="green">2</span>,<span class="blue">3</span>,<span class="red">1</span>,<span class="blue">3</span>,<span class="red">1</span>,...
+								</span>
+							</span></li>
+						</ol>
+					</section>
+
+
+					<section id="ablationStudy">
+						<h3>Ablation Study</h3>
+						<span class="smallestfont" style="position:relative; top:-25px;">(each problem uses a distinct strategy)</span><br>
+						<ol start="4">
+							<li class="fragment">
+								<span class="green">CommonHeuristic</span>
+								<ul class="smallestfont">
+									<li class="fragment"><span class="term">heuristic_def</span> from <span class="blue">MasterWeighted</span></li>
+									<li class="fragment">values from <span class="term">--auto</span> for all the other 107 strategy parameters</li>
+								</ul>
+							</li>
+							<li class="fragment">
+								<span class="green">CommonElse <span class="smallestfont yellow" style="font-size:0.6em; margin-left:2em;">(converse of CommonHeuristic)</span></span>
+								<ul class="smallestfont">
+									<li class="fragment">values from <span class="term">--auto</span> for <span class="term">heuristic_def</span> </li>
+									<li class="fragment">values from <span class="blue">MasterWeighted</span> for all the other 107 strategy parameters</li>
+								</ul>
+							</li>
+						</ol>
+					</section>
+					
+					<section id="hindsightStudies">
+						<h3>Hindsight Studies</h3>
+						<span class="smallestfont" style="position:relative; top:-25px;">(these require proof attempts before creation)</span><br>
+						<ol start="6">
+							<li class="fragment">
+								<span class="green smallfont">MasterSuccess: <span class="fragment smallestfont yellow" style="font-size:0.55em; margin-left:0.9em;">"Can <span class="term">--auto</span> be trusted if its strategy can't solve the problem?"</span></span>
+								<ul class="smallestfont">
+									<!-- <li class="fragment">"Can <span class="term">--auto</span> be trusted if its strategy can't solve the problem?"</li> -->
+									<li class="fragment">Only <span class="term">--auto</span> strategies that solve their problems get merged</li>
+									<li class="fragment">(all problems share the same strategy)</li>
+								</ul>
+							</li>
+							<li class="fragment">
+								<span class="green smallfont">AutoAll: <span class="fragment smallestfont yellow" style="font-size:0.55em; margin-left:0.9em;">"What if E always picked its best strategy for every problem?"</span></span>
+								<ul class="smallestfont">
+									<!-- <li class="fragment">"What if E always picked its best strategy for every problem?"</li> -->
+									<li class="fragment">Run all strategies on all problems and keep the best one for each problem</li>
+									<li class="fragment">(not all problems share the same strategy)</li>
+								</ul>
+							</li>
+						</ol>
+					</section>
+
+
+					<section>
+						<h4>Interactive Theorem Proving (ITP) Application</h4>
+						<ol start="8">
+							<li class="fragment">
+								<span class="green">MasterIncremental</span>
+								<ul class="smallestfont">
+									<li class="fragment">A <span class="green">stream</span> of problems instead of a <span class="red">batch</span></li>
+									<li class="fragment">Merge <span class="term">--auto</span> strategies incrementally</li>
+									<li class="fragment">
+										First problem's strategy = <span class="term">--auto</span>
+									</li>
+									<li class="fragment">
+										Last problem's strategy = <span class="blue">MasterWeighted</span>
+									</li>
+								</ul>
+							</li>
+						</ol>
+					</section>
+
+
+
+					<section>
+						<h3>Strategy Merging Summary</h3>
+						<img src="images/stratMergingArchitecture.svg" style="background:rgba(255,255,255,0.8); max-width:750px">
+					</section>
+
+
+
+				</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				<section>
+					<h3>Ideas for Future Research</h3>
+					<ul style="font-size: 0.7em;">
+						<li class="fragment">
+							Explore alternate <span class="green">state</span> representations
+							<ul>
+								<li class="fragment">Use a history of past states and actions as the state (frame stacking)</li>
+								<li class="fragment">Incorporate features from each CEF such as:
+									<ul>
+										<li class="fragment">The average weight of the top few clauses in each CEF queue</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+						
+						<li class="fragment"><hr>Explore alternate <span class="red">action</span> representations
+							<ul>
+								<li class="fragment">Pick a set of CEFs by targeting diversity</li>
+							</ul>
+						</li>
+
+						<li class="fragment"><hr>Explore alternate <span class="yellow">rewards</span>
+							<ul>
+								<li class="fragment">Use <span class="green">$\frac{1}{n-1}$</span> per proof clause to incentivize finding shorter proofs</li>
+							</ul>
+						</li>
+
+						<li class="fragment"><hr>
+							Use Monte Carlo Tree Search to search for a proof using the learned state values, <span class="green">$V(s)$</span>
+						</li>
+					</ul>
+				</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				<section>
+					<h3>Thanks for listening</h3>
+					<em class="green">Questions?</em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<em class="green">Suggestions?</em><br>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				hash: true,
+				math: {
+					mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full', // See http://docs.mathjax.org/en/latest/config-files.html
+					// pass other options into `MathJax.Hub.Config()`
+					TeX: { Macros: { RR: "{\\bf R}" } }
+				},
+
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/highlight/highlight.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/math/math.js', async: true }
+				],
+
+				slideNumber:true
+			});
+
+
+			document.addEventListener("keypress", function(e){
+				if (e.key == 'u'){
+					document.querySelector("#outline").classList.add("floatingOutline")
+				}
+			})
+
+		</script>
+	</body>
+</html>
