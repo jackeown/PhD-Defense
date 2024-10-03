@@ -103,6 +103,12 @@
 				font-weight: 600;
 			}
 
+			.bestMethod{
+				color:rgb(130, 203, 255);
+				font-weight: 600;
+				text-decoration: underline;
+			}
+
 
 			table{
 				border: 1px solid white;
@@ -121,6 +127,10 @@
 			/* make non-first-child td right-aligned */
 			.reveal table tr td:not(:first-child){
 				text-align:right;
+			}
+
+			table td, table th{
+				border-right: 1px solid white;
 			}
 
 		</style>		<div class="reveal">
@@ -1390,6 +1400,30 @@ Example "heuristic" in RL mode
 						</div>
 					</section>
 
+					<section id="criticVis">
+						<h3>Critic Visualization MPTPTP2078</h3>
+						<div class="row">
+							<img src="images/critic/MPT/MPTNN1.png" style="max-width:36%">
+							<img src="images/critic/MPT/MPTNN1_solved_vs_unsolved.png" style="max-width:36%">
+						</div>
+					</section>
+
+					<section id="criticVis">
+						<h3>Critic Visualization VBT</h3>
+						<div class="row">
+							<img src="images/critic/VBT/VBTNN1.png" style="max-width:36%">
+							<img src="images/critic/VBT/VBTNN1_solved_vs_unsolved.png" style="max-width:36%">
+						</div>
+					</section>
+
+					<section id="criticVis">
+						<h3>Critic Visualization SLH</h3>
+						<div class="row">
+							<img src="images/critic/SLH/SLHNN1.png" style="max-width:36%">
+							<img src="images/critic/SLH/SLHNN1_solved_vs_unsolved.png" style="max-width:36%">
+						</div>
+					</section>
+
 				</section>
 
 
@@ -1504,6 +1538,203 @@ Example "heuristic" in RL mode
 					</section>
 
 
+					<section>
+						<h3>Strategy Merging Results</h3>
+						<span class="smallestfont yellow" style="float: left">Problems Solved</span>
+						<table style="font-size:0.5em; margin: 0 auto;">
+							<tr>
+								<th><span class="h">Dataset</span></th>
+								<th><span class="h">Master<br>AllOnes</span></th>
+								<th><span class="h">Master<br>Weighted</span></th>
+								<th><span class="h">Master<br>Weighted<br>RR</span></th>
+								<th><span class="h">Master<br>Success</span></th>
+								<th><span class="h">Common<br>Heuristic</span></th>
+								<th><span class="h">Common<br>Else</span></th>
+								<th><span class="h">Master<br>Incr.</span></th>
+								<th><span class="h term">auto</span></th>
+								<th><span class="h term">auto-sched</span></th>
+								<th><span class="h">Auto<br>All</span></th>
+							</tr>
+							<tr>
+								<td><span class="h">M'2078</span></td>
+								<td><span class="bestMethod">1219</span></td>
+								<td>1210</td>
+								<td>1201</td>
+								<td>1199</td>
+								<td>1170</td>
+								<td>1086</td>
+								<td>1199</td>
+								<td>1151</td>
+								<td>1279</td>
+								<td>1438</td>
+							</tr>
+							<tr>
+								<td><span class="h">VBT</span></td>
+								<td>2701</td>
+								<td>2841</td>
+								<td><span class="bestMethod">2858</span></td>
+								<td>2806</td>
+								<td>2710</td>
+								<td>2521</td>
+								<td>2785</td>
+								<td>2637</td>
+								<td>2759</td>
+								<td>3596</td>
+							</tr>
+							<tr>
+								<td><span class="h">SLH-29</span></td>
+								<td>3642</td>
+								<td><span class="bestMethod">3743</span></td>
+								<td>3565</td>
+								<td>3505</td>
+								<td>3430</td>
+								<td>3371</td>
+								<td>3556</td>
+								<td>3396</td>
+								<td>4050</td>
+								<td>4203</td>
+							</tr>
+						</table>
+					</section>
+
+
+					<section>
+						<h3>Strategy Merging Results</h3>
+						<span class="smallestfont yellow" style="float: left">Median Processed Clauses</span>
+						
+						<table style="font-size:0.5em; margin: 0 auto;">
+							<tr>
+								<th><b>Dataset</b></th>
+								<th><b>Master<br>AllOnes</b></th>
+								<th><b>Master<br>Weighted</b></th>
+								<th><b>Master<br>Weighted<br>RR</b></th>
+								<th><b>Master<br>Success</b></th>
+								<th><b>Common<br>Heuristic</b></th>
+								<th><b>Common<br>Else</b></th>
+								<th><b>Master<br>Incr.</b></th>
+								<th><b class="term">--auto</b></th>
+								<th><b>Auto<br>All</b></th>
+							</tr>
+							<tr>
+								<td><b>M'2078</b></td>
+								<td><span class="bestMethod">88</span></td>
+								<td>89</td>
+								<td>97</td>
+								<td>106</td>
+								<td>91</td>
+								<td>98</td>
+								<td>97</td>
+								<td>95</td>
+								<td>46</td>
+							</tr>
+							<tr>
+								<td><b>VBT</b></td>
+								<td><span class="bestMethod">1258</span></td>
+								<td>1341</td>
+								<td>1302</td>
+								<td>1336</td>
+								<td>1304</td>
+								<td>1734</td>
+								<td>1336</td>
+								<td>1663</td>
+								<td>636</td>
+							</tr>
+							<tr>
+								<td><b>SLH-29</b></td>
+								<td>883</td>
+								<td><span class="bestMethod">758</span></td>
+								<td>843</td>
+								<td>769</td>
+								<td>938</td>
+								<td>1061</td>
+								<td>767</td>
+								<td>1453</td>
+								<td>499</td>
+							</tr>
+						</table>
+						<br>
+						<span class="smallestfont yellow" style="float: left">Mean Processed Clauses</span>
+						<table style="font-size:0.5em; margin: 0 auto;">
+							<tr>
+								<th>Dataset</th>
+								<th>Master<br>AllOnes</th>
+								<th>Master<br>Weighted</th>
+								<th>Master<br>Weighted<br>RR</th>
+								<th>Master<br>Success</th>
+								<th>Common<br>Heuristic</th>
+								<th>Common<br>Else</th>
+								<th>Master<br>Incr.</th>
+								<th><span class="term">--auto</span></th>
+								<th>Auto<br>All</th>
+							</tr>
+							<tr>
+								<td>M'2078</td>
+								<td><span class="bestMethod">572</span></td>
+								<td>769</td>
+								<td>657</td>
+								<td>797</td>
+								<td>1136</td>
+								<td>2782</td>
+								<td>932</td>
+								<td>2745</td>
+								<td>119</td>
+							</tr>
+							<tr>
+								<td>VBT</td>
+								<td><span class="bestMethod">1611</span></td>
+								<td>1644</td>
+								<td>1657</td>
+								<td>1667</td>
+								<td>1678</td>
+								<td>1957</td>
+								<td>1647</td>
+								<td>2010</td>
+								<td>896</td>
+							</tr>
+							<tr>
+								<td>SLH-29</td>
+								<td>2056</td>
+								<td><span class="bestMethod">1526</span></td>
+								<td>1735</td>
+								<td>1539</td>
+								<td>1757</td>
+								<td>2694</td>
+								<td>1514</td>
+								<td>3472</td>
+								<td>715</td>
+							</tr>
+						</table>
+					</section>
+
+
+					<section>
+						<h3>Strategy Merging Results</h3>
+						<ul class="smallerfont">
+							<li class="fragment">Strategy merging works in general</li>
+							<li class="fragment"><span class="green">MasterWeightedRR</span> does not beat <span class="green">MasterWeighted</span></li>
+							<li class="fragment"><span class="green">MasterSuccess</span> does not beat <span class="green">MasterWeighted</span> or <span class="green">MasterAllOnes</span></li>
+							<li class="fragment">Incremental strategy merging works <br><span class="yellow" style="padding-left:2em;">(although not as well as non-incremental merging)</span></li>
+							<li class="fragment">
+								<span class="fragment"><span class="green">MasterWeighted</span> $>$</span>
+								<span class="fragment"><span class="green">CommonHeuristic</span> $>$</span> 
+								<span class="fragment"><span class="yellow term">--auto</span> $>$ </span>
+								<span class="fragment"><span class="red">CommonElse</span></span>
+							</li>
+							<li class="fragment"><span class="green">AutoAll</span> $>>$ <span class="red">Everything</span></li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>Incremental E Wrapper Code</h3>
+						<ul class="smallerfont">
+							<li class="fragment">Standalone Python program that calls E, handling incremental merging automatically.</li>
+							<li class="fragment">Can also perform non-incremental merging</li>
+							<li class="fragment"><a href="https://github.com/jackeown/IncrementalEWrapper">https://github.com/jackeown/IncrementalEWrapper</a></li>
+						</ul>
+						
+					</section>
+
+
 
 				</section>
 
@@ -1527,25 +1758,11 @@ Example "heuristic" in RL mode
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 				<section>
 					<h3>Ideas for Future Research</h3>
-					<ul style="font-size: 0.7em;">
+					<ul style="font-size: 0.6em;">
 						<li class="fragment">
-							Explore alternate <span class="green">state</span> representations
+							Different <span class="green">state</span> representations
 							<ul>
 								<li class="fragment">Use a history of past states and actions as the state (frame stacking)</li>
 								<li class="fragment">Incorporate features from each CEF such as:
@@ -1556,13 +1773,13 @@ Example "heuristic" in RL mode
 							</ul>
 						</li>
 						
-						<li class="fragment"><hr>Explore alternate <span class="red">action</span> representations
+						<li class="fragment"><hr>Different <span class="red">action</span> representations
 							<ul>
 								<li class="fragment">Pick a set of CEFs by targeting diversity</li>
 							</ul>
 						</li>
 
-						<li class="fragment"><hr>Explore alternate <span class="yellow">rewards</span>
+						<li class="fragment"><hr>Different <span class="yellow">rewards</span>
 							<ul>
 								<li class="fragment">Use <span class="green">$\frac{1}{n-1}$</span> per proof clause to incentivize finding shorter proofs</li>
 							</ul>
@@ -1570,6 +1787,13 @@ Example "heuristic" in RL mode
 
 						<li class="fragment"><hr>
 							Use Monte Carlo Tree Search to search for a proof using the learned state values, <span class="green">$V(s)$</span>
+							<ul>
+								<li class="fragment">Process overhead was too high.</li>
+							</ul>
+						</li>
+
+						<li class="fragment"><hr>
+							Incorporate incremental strategy merging into Isabelle
 						</li>
 					</ul>
 				</section>
