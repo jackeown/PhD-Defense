@@ -252,76 +252,77 @@
 				</section>
 
 				<section id="eQueues">
-					<h4>Given Clause Selection Queues in E</h4>
-					<style>
-						.Equeue{
-							display: flex;
-							padding: 0.3em;
-							width:   100%;
-							align-items: center;
-						}
-						.Eclause{
-							width:  0.8em;
-							height: 0.8em;
-							margin: 0.1em 0.2em;
-							align-items: center;
-							display: flex;
-							justify-content: center;
-						}
-					</style>
-					<div class="Equeue box">
-						<div class="Eclause"> $\leftarrow$</div>
-						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
-						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
-						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
-						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
-						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
-						<div class="Eclause">$...$</div>
-						<div style="width:2em;"></div>
-						<div class="smallerfont">10*Clauseweight(PreferGoals,1,1,1)</div>
-					</div>
-
-					<div class="Equeue box">
-						<div class="Eclause"> $\leftarrow$</div>
-						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
-						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
-						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
-						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
-						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
-						<div class="Eclause">$...$</div>
-						<div style="width:2em;"></div>
-						<div class="smallerfont">10*Clauseweight(PreferNonGoals,1,1,1)
+					<section>
+						<h4>Given Clause Selection Queues in E</h4>
+						<style>
+							.Equeue{
+								display: flex;
+								padding: 0.3em;
+								width:   100%;
+								align-items: center;
+							}
+							.Eclause{
+								width:  0.8em;
+								height: 0.8em;
+								margin: 0.1em 0.2em;
+								align-items: center;
+								display: flex;
+								justify-content: center;
+							}
+						</style>
+						<div class="Equeue box">
+							<div class="Eclause"> $\leftarrow$</div>
+							<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+							<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+							<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+							<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+							<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+							<div class="Eclause">$...$</div>
+							<div style="width:2em;"></div>
+							<div class="smallerfont">10*Clauseweight(PreferGoals,1,1,1)</div>
 						</div>
-					</div>
-
-					<div class="Equeue box">
-						<div class="Eclause"> $\leftarrow$</div>
-						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
-						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
-						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
-						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
-						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
-						<div class="Eclause">$...$</div>
-						<div style="width:2em;"></div>
-						<div class="smallerfont">10*Clauseweight(ByHornDist,1,1,1)</div>
-					</div>
-
-					$\vdots$
-
-
-					<div class="Equeue box">
-						<div class="Eclause"> $\leftarrow$</div>
-						<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
-						<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
-						<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
-						<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
-						<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
-						<div class="Eclause">$...$</div>
-						<div style="width:2em;"></div>
-						<div class="smallerfont">1*FIFOWeight(ConstPrio)</div>
-					</div>
-
-					<textarea  cols="50" rows="8" style="overflow: hidden;">
+	
+						<div class="Equeue box">
+							<div class="Eclause"> $\leftarrow$</div>
+							<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+							<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+							<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+							<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+							<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+							<div class="Eclause">$...$</div>
+							<div style="width:2em;"></div>
+							<div class="smallerfont">10*Clauseweight(PreferNonGoals,1,1,1)
+							</div>
+						</div>
+	
+						<div class="Equeue box">
+							<div class="Eclause"> $\leftarrow$</div>
+							<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+							<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+							<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+							<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+							<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+							<div class="Eclause">$...$</div>
+							<div style="width:2em;"></div>
+							<div class="smallerfont">10*Clauseweight(ByHornDist,1,1,1)</div>
+						</div>
+	
+						$\vdots$
+	
+	
+						<div class="Equeue box">
+							<div class="Eclause"> $\leftarrow$</div>
+							<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
+							<div class="box Eclause" style="background-color:rgb(255, 255, 123)"></div>
+							<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
+							<div class="box Eclause" style="background-color:rgb(250, 170, 10)"></div>
+							<div class="box Eclause" style="background-color:rgb(150, 255, 150)"></div>
+							<div class="Eclause">$...$</div>
+							<div style="width:2em;"></div>
+							<div class="smallerfont">1*FIFOWeight(ConstPrio)</div>
+						</div>
+	
+						<textarea  cols="50" rows="8" style="overflow: hidden;">
 Example Heuristic in E:
 (fixed for a proof attempt)
 
@@ -330,8 +331,130 @@ Example Heuristic in E:
 10 * Clauseweight(ByHornDist,1,1,1),
 ...
 1 * FIFOWeight(ConstPrio)
-					</textarea>
+						</textarea>
+					</section>
 
+
+					<section>
+						<h3>Example E Strategy</h3>
+						<pre>
+							<code style="line-height:1.1em; font-size:0.6em; max-height:500px;">
+{
+   ordertype:               KBO6
+   to_weight_gen:           precedence
+   to_prec_gen:             invfreqhack
+   rewrite_strong_rhs_inst: true
+   to_pre_prec:             ""
+   conj_only_mod:           0
+   conj_axiom_mod:          0
+   axiom_only_mod:          0
+   skolem_mod:              0
+   defpred_mod:             0
+   force_kbo_var_weight:    false
+   to_pre_weights:          ""
+   to_const_weight:         0
+   to_defs_min:             false
+   lit_cmp:                 1
+   lam_w:                   20
+   db_w:                    10
+   ho_order_kind:           lfho
+}
+no_preproc:                     false
+eqdef_maxclauses:               20000
+eqdef_incrlimit:                20
+formula_def_limit:              24
+sine:                           "Auto"
+add_goal_defs_pos:             false
+add_goal_defs_neg:             false
+add_goal_defs_subterms:        false
+heuristic_name: Default
+heuristic_def: "(1.ConjectureRelativeSymbolWeight(SimulateSOS,0.5,100,100,100,100,1.5,1.5,1),
+               4.ConjectureRelativeSymbolWeight(ConstPrio,0.1,100,100,100,100,1.5,1.5,1.5),
+               1.FIFOWeight(PreferProcessed),
+               1.ConjectureRelativeSymbolWeight(PreferNonGoals,0.5,100,100,100,100,1.5,1.5,1),
+               4.Refinedweight(SimulateSOS,3,2,2,1.5,2))"
+prefer_initial_clauses:         false
+selection_strategy:             SelectComplexExceptUniqMaxHorn
+pos_lit_sel_min:                0
+pos_lit_sel_max:                9223372036854775807
+neg_lit_sel_min:                0
+neg_lit_sel_max:                9223372036854775807
+all_lit_sel_min:                0
+all_lit_sel_max:                9223372036854775807
+weight_sel_min:                 0
+select_on_proc_only:            false
+inherit_paramod_lit:            false
+inherit_goal_pm_lit:            false
+inherit_conj_pm_lit:            false
+enable_eq_factoring:            true
+enable_neg_unit_paramod:        true
+enable_given_forward_simpl:     true
+pm_type:                        ParamodSim
+ac_handling:                    1
+ac_res_aggressive:              true
+forward_context_sr:             true
+forward_context_sr_aggressive:  false
+backward_context_sr:            false
+forward_subsumption_aggressive: false
+forward_demod:                  2
+prefer_general:                 false
+condensing:                     false
+condensing_aggressive:          false
+er_varlit_destructive:          true
+er_strong_destructive:          true
+er_aggressive:                  true
+split_clauses:                  0
+split_method:                   0
+split_aggressive:               false
+split_fresh_defs:               true
+rw_bw_index_type:               FP7
+pm_from_index_type:             FP7
+pm_into_index_type:             FP7
+sat_check_grounding:            ConjMinMinFreq
+sat_check_step_limit:           5000
+sat_check_size_limit:           9223372036854775807
+sat_check_ttinsert_limit:       9223372036854775807
+sat_check_normconst:            false
+sat_check_normalize:            false
+sat_check_decision_limit:       10000
+filter_orphans_limit:           9223372036854775807
+forward_contract_limit:         9223372036854775807
+delete_bad_limit:               2000000000
+mem_limit:                      0
+watchlist_simplify:             true
+watchlist_is_static:            false
+use_tptp_sos:                   false
+presat_interreduction:          true
+detsort_bw_rw:                  false
+detsort_tmpset:                 false
+arg_cong:                       all
+neg_ext:                        off
+pos_ext:                        off
+ext_rules_max_depth:            -1
+inverse_recognition:            false
+replace_inj_defs:               false
+lift_lambdas:                  true
+lambda_to_forall:              true
+unroll_only_formulas:          true
+elim_leibniz_max_depth:        -1
+prim_enum_mode:                pragmatic
+prim_enum_max_depth:           -1
+inst_choice_max_depth:         -1
+local_rw:                      false
+prune_args:                    false
+preinstantiate_induction:      false
+fool_unroll:                   true
+func_proj_limit:               0
+imit_limit:                    0
+ident_limit:                   0
+elim_limit:                    0
+unif_mode:                     single
+pattern_oracle:                true
+fixpoint_oracle:               true
+max_unifiers:                  4
+max_unif_steps:                256</code>
+						</pre>
+					</section>
 				</section>
 
 
