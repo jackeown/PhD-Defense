@@ -146,27 +146,27 @@
 					<h3>Outline</h3>
 					<div class="box">
 						<ol>
-							<li class="fragment">First-Order Logic & CNF</li>
+							<li class="fragment">First-order logic & CNF</li>
 							<li class="fragment">Saturation-based ATP</li>
-							<li class="fragment">Given Clause Selection</li>
+							<li class="fragment">Given clause selection</li>
 							<li class="fragment">E proof search strategies</li>
 							<li class="fragment">
-								Relevant Previous Work
+								Relevant previous work
 								<ul class="small">
 									<li>Enigma-NG</li>
 									<li>TRAIL</li>
-									<li>DeepMind Hindsight Experience Replay</li>
+									<li>DeepMind Hindsight Experience Replay (HER)</li>
 								</ul>
 							</li>
 							
-							<li class="fragment">Reinforcement Learning
+							<li class="fragment">Reinforcement learning
 								<ul class="small">
-									<li class="fragment">Proximal Policy Optimization</li>
-									<li class="fragment">My RL Setup for Given Clause Selection</li>
+									<li class="fragment">Proximal Policy Optimization (PPO)</li>
+									<li class="fragment">My RL setup for given clause selection</li>
 								</ul>
 							</li>
-							<li class="fragment">E Strategy Merging</li>
-							<li class="fragment">Conclusion / Future Research</li>
+							<li class="fragment">E strategy merging</li>
+							<li class="fragment">Conclusion / future research</li>
 						</ol>
 					</div>
 				</section>
@@ -178,7 +178,7 @@
 					<h3>First Order Logic</h3>
 					<hr>
 					<ul class="small">
-						<li class="fragment"><span class="green">Propositions and Logical Connectives</span> <br>(from propositional logic)<br><br></li>
+						<li class="fragment"><span class="green">Propositions and logical connectives</span> <br>(from propositional logic)<br><br></li>
 						<li class="fragment"><span class="green">Variables</span></li>
 						<li class="fragment"><span class="green">Functions</span> (which produce non-booleans)</li>
 						<li class="fragment"><span class="green">Predicates</span> (which produce booleans)</li>
@@ -197,7 +197,7 @@
 							<span class="green">
 								$$ \underbrace{p(X, f(sk(X))) \; \vee \; q(X)}_{clause} \;\; \bigwedge \;\; \underbrace{p(X, f(sk(X))) \; \vee \;q(sk(X))}_{clause} $$
 							</span>
-							in Conjunctive/Clause Normal Form (CNF).<br>
+							in Clause Normal Form (CNF).<br>
 							(All variables are universally quantified.)
 						</span>
 					</div>
@@ -206,11 +206,11 @@
 				<section id="saturation">
 					<h3>Saturation</h3>
 					<ul class="smallerfont">
+                  <li class="fragment"><span class="green">Saturation:</span> Compute the closure with sound inference rules</li>
 						<li class="fragment">
 							Prove conjecture $C$ from Axioms by showing that <br>
 							&nbsp;&nbsp;&nbsp;&nbsp;<span class="green">CNF(Axioms $\cup$ $\{\sim C\}$)</span><br> is unsatisfiable
 						</li>
-						<li class="fragment"><span class="green">Saturation:</span> Compute the closure with sound inference rules</li>
 						<li class="fragment">Show unsatisfiability by inferring the empty clause via saturation</li>
 						<!-- <li class="fragment smaller green">(Intuition: the empty clause must be false because if the empty clause were true, then every clause would need to be as well: <br>$empty | false \equiv false$)</li> -->
 					</ul>
@@ -240,7 +240,7 @@
 								<li class="fragment">Careful management of resources</li>
 							</ul>
 						</li>
-						<li class="fragment">Can automatically select guidance strategies:
+						<li class="fragment">Can automatically select proof-search guidance strategies:
 							<ul>
 								<li class="fragment smallerfont"> <span class="term">--auto</span></li>
 								<li class="fragment smallerfont"> <span class="term">--auto-schedule</span></li>
@@ -291,7 +291,7 @@
 							<div class="box Eclause" style="background-color:rgb(150, 150, 255)"></div>
 							<div class="Eclause">$...$</div>
 							<div style="width:2em;"></div>
-							<div class="smallerfont">10*Clauseweight(PreferNonGoals,1,1,1)
+							<div class="smallerfont">5*Clauseweight(PreferNonGoals,1,1,1)
 							</div>
 						</div>
 	
@@ -304,7 +304,7 @@
 							<div class="box Eclause" style="background-color:rgb(255, 150, 150)"></div>
 							<div class="Eclause">$...$</div>
 							<div style="width:2em;"></div>
-							<div class="smallerfont">10*Clauseweight(ByHornDist,1,1,1)</div>
+							<div class="smallerfont">8*Clauseweight(ByHornDist,1,1,1)</div>
 						</div>
 	
 						$\vdots$
@@ -327,8 +327,8 @@ Example Heuristic in E:
 (fixed for a proof attempt)
 
 10 * Clauseweight(PreferGoals,1,1,1),
-10 * Clauseweight(PreferNonGoals,1,1,1),
-10 * Clauseweight(ByHornDist,1,1,1),
+ 5 * Clauseweight(PreferNonGoals,1,1,1),
+ 8 * Clauseweight(ByHornDist,1,1,1),
 ...
 1 * FIFOWeight(ConstPrio)
 						</textarea>
@@ -467,7 +467,7 @@ max_unif_steps:                256</code>
 					<h3>GCS as Supervised Learning</h3>
 					<ul class="smallerfont">
 						<li class="fragment">Learn a function to evaluate clauses: <span class="green">$f_\theta(clause, context) \rightarrow score$</span></li>
-						<li class="fragment">Clause representation is linked with model architecture</li>
+						<li class="fragment"><span class="yellow">Clause representation</span> is linked with <span class="yellow">$f_\theta$'s structure</span> </li>
 						<li class="fragment"><span class="green">$f$</span> 
 							is trained as a classifier using successful proofs:
 							<ul>
@@ -479,6 +479,7 @@ max_unif_steps:                256</code>
 							<h4 style="margin-bottom:0px">Drawbacks</h4>
 							<li class="fragment red">Usually relies on consistent signature</li>
 							<li class="fragment red">Highly unbalanced training data <br>(most selected clauses aren't in the proof)</li>
+                     <li class="fragment red">One classifier evaluation per inferred clause</li>
 						</div>
 					</ul>
 				</section>
@@ -539,7 +540,7 @@ max_unif_steps:                256</code>
 							<li class="fragment">Another "in-proofness" classifier CEF</li>
 							<li class="fragment">Hindsight Experience Replay (DeepMind - 2017)</li>
 							<li class="fragment">Provides extra training data using "hindsight goals":
-								<ul>
+								<ul class="smallerfont">
 									<li class="fragment">Failed to saturate <span class="green">$CNF(Ax \cup \{\sim C\})$</span></li>
 									<li class="fragment">Create a synthetic problem <span class="green">$CNF(Ax \cup \{\sim C, \sim D\})$</span> from any clause <span class="green">$D$</span> derived during the attempt</li>
 								</ul>
@@ -648,7 +649,7 @@ Example "heuristic" in RL mode
 						<ul style="font-size:0.7em;">
 							<!-- <li class="fragment">Simpler successor to Trust Region Policy Optimization (TRPO)</li> -->
 							<li class="fragment">Main Idea: <span class="green">Learn from the same data multiple times in
-									mini-batches <br>without drastically affecting the current policy.</span></li>
+									mini-batches</span></li>
 							<span class="fragment">
 								<li>A special loss limits the gradient so that 
 									<span class="green">$0.8\pi_{old}(s,a) \leq \pi(s,a) \leq 1.2\pi_{old}(s,a)$</span>
@@ -709,9 +710,12 @@ Example "heuristic" in RL mode
 									<li class="fragment">Merge these strategies into one <span class="green">master strategy</span>
 										<ul>
 											<li class="fragment" style="font-size:0.95em;">Most <span class="green">strategy</span> components set to their most common value</li>
-											<li class="fragment" style="font-size:0.95em;">Every CEF is included in the <span class="green">master strategy</span> heuristic</li>
-											<li class="fragment" style="font-size:0.95em;">Heuristic weights set intuitively $\rightarrow$ <span class="green">MasterWeighted</li>
-											<li class="fragment" style="font-size:0.95em;">Heuristic weights set to <span class="green">1</span> $\rightarrow$ <span class="green">MasterAllOnes</li>
+											<li class="fragment" style="font-size:0.95em;">Every CEF is included in the <span class="green">master strategy</span> heuristic
+                                    <ul>
+                                       <li class="fragment" style="font-size:0.95em;">Heuristic weights set intuitively $\rightarrow$ <span class="green">MasterWeighted</li>
+                                       <li class="fragment" style="font-size:0.95em;">Heuristic weights set to <span class="green">1</span> $\rightarrow$ <span class="green">MasterAllOnes</li>
+                                    </ul>
+                                 </li>
 										</ul>
 									</li>
 								</ul>
@@ -754,7 +758,7 @@ Example "heuristic" in RL mode
 								<span class="smallfont">E's best strategy <span class="yellow">(other than <span class="term">--auto-schedule</span>)</span></span>
 							</li>
 							<li class="fragment" style="margin-bottom:10px;line-height:1.3em;">
-								<span class="green" style="text-decoration:underline">MasterWeighted / MasterAllOnes</span>:
+								<span class="green" style="text-decoration:underline">MasterAllOnes / MasterWeighted</span>:
 								<span class="smallfont"> 
 									<br><span class="yellow">(Derived from <span class="term">--auto</span> over that dataset)</span>
 								</span>
@@ -796,15 +800,15 @@ Example "heuristic" in RL mode
 							<br>
 							<li class="fragment"><span class="green">VBT</span> - Big Typed First Order Problems
 								<ul>
-									<li class="fragment">Used in CASCJ11</li>
 									<li class="fragment"><em style="text-decoration: underline;">van Emde Boas Trees</em> entry in Isabelle's Archive of Formal Proofs (AFP)</li>
+									<li class="fragment">Used in CASCJ11</li>
 								</ul>
 							</li>
 							<br>
 							<li class="fragment"><span class="green">SLH-29</span> - Higher Order Problems
 								<ul>
-									<li class="fragment">Used in CASCJ11</li>
 									<li class="fragment">From Isabelle's Sledgehammer mode</li>
+									<li class="fragment">Used in CASCJ11</li>
 								</ul>
 							</li>
 						</ul>
@@ -834,7 +838,7 @@ Example "heuristic" in RL mode
 								<tr>                                                                                                                                                                                                                                                                                                                       
 								<th>Run</th>                                                                                                                                                                                                                                                                                                               
 								<th>Solved</th>                                                                                                                                                                                                                                                                                                            
-								<th>vs Auto</th>                                                                                                                                                                                                                                                                                                    
+								<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                    
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
 								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
@@ -862,7 +866,7 @@ Example "heuristic" in RL mode
 								<td>+113 , -54</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>Auto</td>                                                                                                                                                                                                                                                                                                           
+								<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
 								<td>1151</td>                                                                                                                                                                                                                                                                                                              
 								<td>+0 , -0</td>                                                                                                                                                                                                                                                                                                           
 								</tr>                                                                                                                                                                                                                                                                                                                      
@@ -872,7 +876,7 @@ Example "heuristic" in RL mode
 								<tr>                                                                                                                                                                                                                                                                                                                       
 								<th>Run</th>                                                                                                                                                                                                                                                                                                               
 								<th>Solved</th>                                                                                                                                                                                                                                                                                                            
-								<th>vs Auto</th>                                                                                                                                                                                                                                                                                                    
+								<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                    
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
 								<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
@@ -900,7 +904,7 @@ Example "heuristic" in RL mode
 								<td>+215 , -151</td>                                                                                                                                                                                                                                                                                                       
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                  
-								<td>Auto</td>                                                                                                                                                                                                                                                                                                           
+								<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
 								<td>2637</td>                                                                                                                                                                                                                                                                                                              
 								<td>+0 , -0</td>                                                                                                                                                                                                                                                                                                           
 								</tr>                                                                                                                                                                                                                                                                                                                      
@@ -912,7 +916,7 @@ Example "heuristic" in RL mode
 								<tr>
 									<th>Run</th>
 									<th>Solved</th>
-									<th>vs Auto</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
 									<td>MasterWeighted</td>
@@ -940,7 +944,7 @@ Example "heuristic" in RL mode
 									<td>+457 , -211</td>
 								</tr>
 								<tr>
-									<td>Auto</td>
+									<td><span class='term'>--auto</span></td>
 									<td>3396</td>
 									<td>+0 , -0</td>
 								</tr>
@@ -950,6 +954,7 @@ Example "heuristic" in RL mode
 								<li class="fragment smallerfont">Best results on <span class="green">MPTPTP2078</span>
 									<ul>
 										<li class="fragment">Successfully learned to find proofs</li>
+                              <li class="fragment">More proofs make users happy 🎉</li>
 									</ul>
 								</li>
 								<li class="fragment smallerfont">Promising as part of a portfolio<br> 
@@ -975,7 +980,7 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Given Clauses</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
 								<td class="learningBased">ConstCat</td>
@@ -998,7 +1003,7 @@ Example "heuristic" in RL mode
 								<td>-3182.97</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>131.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1014,7 +1019,7 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Given Clauses</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
 								<td>ConstCatDistilled</td>
@@ -1042,7 +1047,7 @@ Example "heuristic" in RL mode
 								<td>-422.24</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>1927.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1056,7 +1061,7 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Given Clauses</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
 								<td>MasterWeighted</td>
@@ -1084,7 +1089,7 @@ Example "heuristic" in RL mode
 								<td>-1731.68</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>1548.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1094,6 +1099,7 @@ Example "heuristic" in RL mode
 								<li class="fragment smallerfont">Learning-based approaches require fewer given clauses for <span class="green">MPTPTP2078</span></li>
 								<li class="fragment smallerfont">Fewer given clauses required by <em>all</em> methods for <span class="green">MPTPTP2078</span></li>
 								<li class="fragment smallerfont">Indicates intelligent proof search! 🎉</li>
+                        <li class="fragment smallerfont">Finding proofs faster makes users happy 🎉</li>
 							</ul>
 						</div>
 
@@ -1111,7 +1117,7 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Generated</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
 								<td class="learningBased">ConstCat</td>
@@ -1134,7 +1140,7 @@ Example "heuristic" in RL mode
 								<td>-37017.26</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>254.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1150,7 +1156,7 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Generated</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
 								<td>ConstCatDistilled</td>
@@ -1178,7 +1184,7 @@ Example "heuristic" in RL mode
 								<td>-1.01</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>8783.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1192,7 +1198,7 @@ Example "heuristic" in RL mode
 								<tr>                                                                                                                                                                                                                                                                                                                       
 								<th>Run</th>                                                                                                                                                                                                                                                                                                               
 								<th>Generated</th>                                                                                                                                                                                                                                                                                                         
-								<th>vs Auto</th>                                                                                                                                                                                                                                                                                                 
+								<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                 
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
 								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
@@ -1220,7 +1226,7 @@ Example "heuristic" in RL mode
 								<td>-20843.68</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>3930.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1250,10 +1256,10 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Proof Clauses</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>23.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1289,7 +1295,7 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Proof Clauses</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
 								<td>ConstCatDistilled</td>
@@ -1312,7 +1318,7 @@ Example "heuristic" in RL mode
 								<td>-0.10</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>13.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1330,10 +1336,10 @@ Example "heuristic" in RL mode
 								<tr>
 								<th>Run</th>
 								<th>Proof Clauses</th>
-								<th>vs Auto</th>
+								<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>11.00</td>
 								<td>0.00</td>
 								</tr>
@@ -1366,6 +1372,11 @@ Example "heuristic" in RL mode
 
 							<ul class="smallestfont" style="width:47%;margin-left:4%;">
 								<li class="fragment">More proof clauses $\rightarrow$ more feedback for learning</li>
+                        <li class="fragment">Smaller proofs make users happy
+                           <ul>
+                              <li class="fragment">Only VBT 😕</li>
+                           </ul>
+                        </li>
 							</ul>
 						</div>
 							
@@ -1402,7 +1413,7 @@ Example "heuristic" in RL mode
 								<td>0.2264</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>0.1926</td>
 								</tr>
 							</table>
@@ -1435,7 +1446,7 @@ Example "heuristic" in RL mode
 								<td>0.0099</td>
 								</tr>
 								<tr>
-								<td>Auto</td>
+								<td><span class='term'>--auto</span></td>
 								<td>0.0091</td>
 								</tr>
 							</table>
@@ -1470,7 +1481,7 @@ Example "heuristic" in RL mode
 								<td>0.0166</td>                                                                                                                                                                                                                                                                                                       
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>Auto</td>                                                                                                                                                                                                                                                                                                           
+								<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
 								<td>0.0095</td>                                                                                                                                                                                                                                                                                                       
 								</tr>                                                                                                                                                                                                                                                                                                                      
 							</table> 
@@ -1502,6 +1513,18 @@ Example "heuristic" in RL mode
 
 						</ul>
 					</section>
+  
+               <section id="policyVisNeuralNet">
+                  <h3>Policy Visualization for NeuralNet</h3>
+                  <div class="row">
+                     <img src="images/MPTNN0_MPT0557+1.p.png" style="max-width:36%;">
+                     <img src="images/MPTNN0_MPT1592+1.p.png" style="max-width:36%;">
+                  </div>
+                  <div class="row">
+                     <img src="images/MPTNN1_MPT1539+1.p.png" style="max-width:36%;">
+                     <img src="images/MPTNN1_MPT1964+1.p.png" style="max-width:36%;">
+                  </div>
+               </section>
 
 					<section id="policyVisConstCat">
 						<h3>Policy Visualization for ConstCat</h3>
@@ -1511,17 +1534,6 @@ Example "heuristic" in RL mode
 						</div>
 					</section>
 
-					<section id="policyVisNeuralNet">
-						<h3>Policy Visualization for NeuralNet</h3>
-						<div class="row">
-							<img src="images/MPTNN0_MPT0557+1.p.png" style="max-width:36%;">
-							<img src="images/MPTNN0_MPT1592+1.p.png" style="max-width:36%;">
-						</div>
-						<div class="row">
-							<img src="images/MPTNN1_MPT1539+1.p.png" style="max-width:36%;">
-							<img src="images/MPTNN1_MPT1964+1.p.png" style="max-width:36%;">
-						</div>
-					</section>
 
 					<section id="criticVis">
 						<h3>Critic Visualization MPTPTP2078</h3>
@@ -1567,6 +1579,12 @@ Example "heuristic" in RL mode
 				<section>
 					<section>
 						<h3>🎉 Strategy Merging Works! 🎉</h3>
+                  <ol class="smallerfont">
+                     <li class="fragment">
+                        E is invoked with <span class="term">--auto --print-strategy</span> on problems without attempting solutions.
+                     </li>
+                  </ol>
+
 					</section>
 
 					<section>
@@ -1619,7 +1637,7 @@ Example "heuristic" in RL mode
 								<ul class="smallestfont">
 									<!-- <li class="fragment">"Can <span class="term">--auto</span> be trusted if its strategy can't solve the problem?"</li> -->
 									<li class="fragment">Only <span class="term">--auto</span> strategies that solve their problems get merged</li>
-									<li class="fragment">(all problems share the same strategy)</li>
+									<li class="fragment">(produces a single strategy)</li>
 								</ul>
 							</li>
 							<li class="fragment">
@@ -1627,7 +1645,7 @@ Example "heuristic" in RL mode
 								<ul class="smallestfont">
 									<!-- <li class="fragment">"What if E always picked its best strategy for every problem?"</li> -->
 									<li class="fragment">Run all strategies on all problems and keep the best one for each problem</li>
-									<li class="fragment">(not all problems share the same strategy)</li>
+									<li class="fragment">(produces 1 strategy per problem)</li>
 								</ul>
 							</li>
 						</ol>
@@ -1723,7 +1741,7 @@ Example "heuristic" in RL mode
 
 					<section>
 						<h3>Strategy Merging Results</h3>
-						<span class="smallestfont yellow" style="float: left">Median Processed Clauses</span>
+						<span class="smallestfont yellow" style="float: left">Median number of given clause selections</span>
 						
 						<table style="font-size:0.5em; margin: 0 auto;">
 							<tr>
@@ -1776,7 +1794,7 @@ Example "heuristic" in RL mode
 							</tr>
 						</table>
 						<br>
-						<span class="smallestfont yellow" style="float: left">Mean Processed Clauses</span>
+						<span class="smallestfont yellow" style="float: left">Mean number of given clause selections</span>
 						<table style="font-size:0.5em; margin: 0 auto;">
 							<tr>
 								<th>Dataset</th>
@@ -1817,12 +1835,12 @@ Example "heuristic" in RL mode
 							<tr>
 								<td>SLH-29</td>
 								<td>2056</td>
-								<td><span class="bestMethod">1526</span></td>
+								<td>1526</td>
 								<td>1735</td>
 								<td>1539</td>
 								<td>1757</td>
 								<td>2694</td>
-								<td>1514</td>
+								<td><span class="bestMethod">1514</span></td>
 								<td>3472</td>
 								<td>715</td>
 							</tr>
@@ -1843,7 +1861,7 @@ Example "heuristic" in RL mode
 								<span class="fragment"><span class="yellow term">--auto</span> $>$ </span>
 								<span class="fragment"><span class="red">CommonElse</span></span>
 							</li>
-							<li class="fragment"><span class="green">AutoAll</span> $>>$ <span class="red">Everything</span></li>
+							<li class="fragment"><span class="green">AutoAll</span> $>>$ <span class="red">Everything</span> (as expected)</li>
 						</ul>
 					</section>
 
@@ -1852,6 +1870,7 @@ Example "heuristic" in RL mode
 						<ul class="smallerfont">
 							<li class="fragment">Standalone Python program that calls E, handling incremental merging automatically.</li>
 							<li class="fragment">Can also perform non-incremental merging</li>
+                     <li class="fragment">Being integrated into Isabelle / Sledgehammer</li>
 							<li class="fragment"><a href="https://github.com/jackeown/IncrementalEWrapper">https://github.com/jackeown/IncrementalEWrapper</a></li>
 						</ul>
 						
@@ -1927,7 +1946,18 @@ Example "heuristic" in RL mode
 
 
 
+            <section>
+               <h3>Publications and Submitted Papers</h3>
 
+               <ul class="smallestfont">
+                  <li class="fragment">Reinforcement Learning in E - <span class="yellow">AITP 2022</span></li>
+                  <li class="fragment">Reinforcement Learning for Guiding the E Theorem Prover - <span class="yellow">FLAIRS 2023</span></li>
+                  <li class="fragment">Adaptive Strategy Curation for the E Theorem Prover - <span class="yellow">IJAIT in progress</span></li>
+                  <li class="fragment"><a href="https://scholar.google.com/citations?user=PdLO8A8AAAAJ">https://scholar.google.com/citations?user=PdLO8A8AAAAJ</a></li>
+               </ul>
+
+
+            </section>
 
 
 
