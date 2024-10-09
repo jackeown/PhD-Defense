@@ -247,6 +247,17 @@
 
 				<section id="eQueues">
 					<section>
+						<h4>Clause Evaluation Functions in E</h4>
+						<span class="smallestfont fragment">
+							$\underbrace{\overbrace{\text{Refinedweight}}^{\text{weight function}}\text{(}\overbrace{\text{PreferGoals}}^{\text{priority function}}\text{,}\overbrace{\text{3,2,2,1.5,2}}^{\text{other parameters}}\text{)}}_{\text{clause evaluation function}}$
+						</span>
+						<br><br>
+						<div class="fragment smallestfont">
+							<span class="green">Clause Evaluation Functions (CEFs)</span> have associated priority queues<br>
+							(used for given clause selection)
+						</div>
+					</section>
+					<section>
 						<h4>Given Clause Selection Queues in E</h4>
 						<style>
 							.Equeue{
@@ -814,7 +825,7 @@ Example "heuristic" in RL mode
 							<li class="fragment"><span class="green">Soft CPU limit</span> for non-learning methods: <span class="blue">60 seconds</span></li>
 							<li class="fragment"><span class="green">Soft CPU limit</span> for learning methods: <span class="blue">75 seconds</span>
 								<ul>
-									<li class="fragment">This was done to account for named pipe communication latency</li>
+									<li class="fragment">To account for named pipe communication latency</li>
 								</ul>
 							</li>
 							<li class="fragment"><span class="red">Hard CPU limit</span> = <span class="green">Soft CPU limit</span> + <span class="blue">5 seconds</span></li>
