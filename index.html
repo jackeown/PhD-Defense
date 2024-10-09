@@ -207,12 +207,12 @@
 					<h3>Saturation</h3>
 					<ul class="smallerfont">
                   <li class="fragment"><span class="green">Saturation:</span> Compute the closure with sound inference rules</li>
+                  <li class="fragment">A <span class="green">problem</span> is a <span class="green">conjecture</span> with <span class="green">axioms</span></li>
 						<li class="fragment">
-							Prove conjecture $C$ from Axioms by showing that <br>
-							&nbsp;&nbsp;&nbsp;&nbsp;<span class="green">CNF(Axioms $\cup$ $\{\sim C\}$)</span><br> is unsatisfiable
+							Prove conjecture $C$ from $Axioms$ by showing that <br>
+							&nbsp;&nbsp;&nbsp;&nbsp;<span class="green">CNF($Axioms \cup \{\sim C\}$)</span><br> is unsatisfiable
 						</li>
 						<li class="fragment">Show unsatisfiability by inferring the empty clause via saturation</li>
-						<!-- <li class="fragment smaller green">(Intuition: the empty clause must be false because if the empty clause were true, then every clause would need to be as well: <br>$empty | false \equiv false$)</li> -->
 					</ul>
 
 				</section>
@@ -221,7 +221,8 @@
 					<h3>Given Clause Selection</h3>
 					<img src="images/processedAndUnprocessedSets7.svg" style="background:white">
 					<ul>
-						<li style="font-size: 0.7em;">Improving given clause selection is a core goal of ATP research</li>
+                  <li style="font-size: 0.7em;" class="fragment">Inferred clauses can be redundant <span class="green fragment">or</span> <span class="fragment">make other clauses redundant</span></li>
+						<li style="font-size: 0.7em;" class="fragment">Improving given clause selection is a core goal of ATP research</li>
 					</ul>
 				</section>
 
@@ -1517,12 +1518,18 @@ Example "heuristic" in RL mode
                <section id="policyVisNeuralNet">
                   <h3>Policy Visualization for NeuralNet</h3>
                   <div class="row">
-                     <img src="images/MPTNN0_MPT0557+1.p.png" style="max-width:36%;">
-                     <img src="images/MPTNN0_MPT1592+1.p.png" style="max-width:36%;">
+                     <img src="images/MPTNN0_MPT0557+1.p.png" style="max-width:33%;">
+                     <img src="images/MPTNN0_MPT1592+1.p.png" style="max-width:33%;">
+                  </div>
+                  <div class="row smallestfont" style="position:relative; top:-0.25em;line-height:0.2em;">
+                     <div class="smallestfont">MPTNN0_MPT0557</div><div class="smallestfont">MPTNN0_MPT1592</div>
                   </div>
                   <div class="row">
-                     <img src="images/MPTNN1_MPT1539+1.p.png" style="max-width:36%;">
-                     <img src="images/MPTNN1_MPT1964+1.p.png" style="max-width:36%;">
+                     <img src="images/MPTNN1_MPT1539+1.p.png" style="max-width:33%;">
+                     <img src="images/MPTNN1_MPT1964+1.p.png" style="max-width:33%;">
+                  </div>
+                  <div class="row smallestfont" style="position:relative; top:-0.25em;line-height:0.2em;">
+                     <div class="smallestfont">MPTNN1_MPT1539</div><div class="smallestfont">MPTNN0_MPT1964</div>
                   </div>
                </section>
 
@@ -1532,30 +1539,34 @@ Example "heuristic" in RL mode
 							<img src="images/MPTConstCat0_MPT0557+1.p.png" style="max-width:45%">
 							<img src="images/MPTConstCat1_MPT1539+1.p.png" style="max-width:45%">
 						</div>
+                  <div class="row smallestfont" style="position:relative; top:-0.25em;line-height:0.2em;">
+                     <div class="smallestfont">MPTConstCat0_MPT0557</div><div class="smallestfont">MPTConstCat0_MPT1539</div>
+                  </div>
+
 					</section>
 
 
 					<section id="criticVis">
 						<h3>Critic Visualization MPTPTP2078</h3>
 						<div class="row">
-							<img src="images/critic/MPT/MPTNN1.png" style="max-width:36%">
-							<img src="images/critic/MPT/MPTNN1_solved_vs_unsolved.png" style="max-width:36%">
+							<img src="images/critic/MPT/MPTNN1.png" style="max-width:45%">
+							<img src="images/critic/MPT/MPTNN1_solved_vs_unsolved.png" style="max-width:45%">
 						</div>
 					</section>
 
 					<section id="criticVis">
 						<h3>Critic Visualization VBT</h3>
 						<div class="row">
-							<img src="images/critic/VBT/VBTNN1.png" style="max-width:36%">
-							<img src="images/critic/VBT/VBTNN1_solved_vs_unsolved.png" style="max-width:36%">
+							<img src="images/critic/VBT/VBTNN1.png" style="max-width:45%">
+							<img src="images/critic/VBT/VBTNN1_solved_vs_unsolved.png" style="max-width:45%">
 						</div>
 					</section>
 
 					<section id="criticVis">
 						<h3>Critic Visualization SLH</h3>
 						<div class="row">
-							<img src="images/critic/SLH/SLHNN1.png" style="max-width:36%">
-							<img src="images/critic/SLH/SLHNN1_solved_vs_unsolved.png" style="max-width:36%">
+							<img src="images/critic/SLH/SLHNN1.png" style="max-width:45%">
+							<img src="images/critic/SLH/SLHNN1_solved_vs_unsolved.png" style="max-width:45%">
 						</div>
 					</section>
 
