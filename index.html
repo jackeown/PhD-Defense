@@ -149,17 +149,10 @@
 							<li class="fragment">First-order logic & CNF</li>
 							<li class="fragment">Saturation-based ATP</li>
 							<li class="fragment">Given clause selection</li>
-							<li class="fragment">E proof search strategies</li>
-							<li class="fragment">
-								Relevant previous work
-								<ul class="small">
-									<li>Enigma-NG</li>
-									<li>TRAIL</li>
-									<li>DeepMind Hindsight Experience Replay (HER)</li>
-								</ul>
-							</li>
+							<li class="fragment">E's proof search strategies</li>
+							<li class="fragment">Relevant previous work</li>
 							
-							<li class="fragment">Reinforcement learning
+							<li class="fragment">Reinforcement learning for given clause selection</li>
 								<ul class="small">
 									<li class="fragment">Proximal Policy Optimization (PPO)</li>
 									<li class="fragment">My RL setup for given clause selection</li>
@@ -571,18 +564,18 @@ max_unif_steps:                256</code>
 						<li class="fragment green">Little overhead compared to neural clause evaluation</li>
 					</ul>
 
-					<textarea class="fragment" cols="50" rows="8" style="overflow: hidden;">
+					<textarea class="fragment" cols="50" rows="9" style="overflow: hidden;">
 Example Heuristic in E:
 (fixed for a proof attempt)
 
 10 * Clauseweight(PreferGoals,1,1,1),
-10 * Clauseweight(PreferNonGoals,1,1,1),
-10 * Clauseweight(ByHornDist,1,1,1),
-1 * FIFOWeight(ConstPrio)
+ 8 * Clauseweight(PreferNonGoals,1,1,1),
+ 5 * Clauseweight(ByHornDist,1,1,1),
+ 1 * FIFOWeight(ConstPrio)
 ...
 												
 					</textarea>
-					<textarea class="fragment" cols="50" rows="8" style="overflow: hidden;">
+					<textarea class="fragment" cols="50" rows="9" style="overflow: hidden;">
 Example "heuristic" in RL mode 
 (probabilities change during proof attempt):
 
@@ -713,8 +706,8 @@ Example "heuristic" in RL mode
 											<li class="fragment" style="font-size:0.95em;">Most <span class="green">strategy</span> components set to their most common value</li>
 											<li class="fragment" style="font-size:0.95em;">Every CEF is included in the <span class="green">master strategy</span> heuristic
                                     <ul>
-                                       <li class="fragment" style="font-size:0.95em;">Heuristic weights set intuitively $\rightarrow$ <span class="green">MasterWeighted</li>
-                                       <li class="fragment" style="font-size:0.95em;">Heuristic weights set to <span class="green">1</span> $\rightarrow$ <span class="green">MasterAllOnes</li>
+										<li class="fragment" style="font-size:0.95em;">Heuristic weights set to <span class="green">1</span> $\rightarrow$ <span class="green">MasterAllOnes</li>
+                                       <li class="fragment" style="font-size:0.95em;">Heuristic weights set proportionately $\rightarrow$ <span class="green">MasterWeighted</li>
                                     </ul>
                                  </li>
 										</ul>
@@ -802,14 +795,14 @@ Example "heuristic" in RL mode
 							<li class="fragment"><span class="green">VBT</span> - Big Typed First Order Problems
 								<ul>
 									<li class="fragment"><em style="text-decoration: underline;">van Emde Boas Trees</em> entry in Isabelle's Archive of Formal Proofs (AFP)</li>
-									<li class="fragment">Used in CASCJ11</li>
+									<li class="fragment">Used in CASC-J11</li>
 								</ul>
 							</li>
 							<br>
-							<li class="fragment"><span class="green">SLH-29</span> - Higher Order Problems
+							<li class="fragment"><span class="green">SLH-29</span> - Medium-sized Higher Order Problems
 								<ul>
 									<li class="fragment">From Isabelle's Sledgehammer mode</li>
-									<li class="fragment">Used in CASCJ11</li>
+									<li class="fragment">Used in CASC-J11</li>
 								</ul>
 							</li>
 						</ul>
@@ -837,77 +830,77 @@ Example "heuristic" in RL mode
 							<table style="font-size:0.4em;">
 								<tr><th></th><th></th><th>MPTPTP2078</th></tr>
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<th>Run</th>                                                                                                                                                                                                                                                                                                               
-								<th>Solved</th>                                                                                                                                                                                                                                                                                                            
-								<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                    
+									<th>Run</th>                                                                                                                                                                                                                                                                                                               
+									<th>Solved</th>                                                                                                                                                                                                                                                                                                            
+									<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                    
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
-								<td>1232</td>                                                                                                                                                                                                                                                                                                              
-								<td>+125 , -44</td>                                                                                                                                                                                                                                                                                                        
+									<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+									<td>1235</td>                                                                                                                                                                                                                                                                                                              
+									<td>+128 , -45</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
-								<td>1229</td>                                                                                                                                                                                                                                                                                                              
-								<td>+125 , -47</td>                                                                                                                                                                                                                                                                                                        
+									<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
+									<td>1234</td>                                                                                                                                                                                                                                                                                                              
+									<td>+123 , -43</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
-								<td>1226</td>                                                                                                                                                                                                                                                                                                              
-								<td>+124 , -49</td>                                                                                                                                                                                                                                                                                                        
+									<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+									<td>1219</td>                                                                                                                                                                                                                                                                                                              
+									<td>+115 , -47</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
-								<td>1219</td>                                                                                                                                                                                                                                                                                                              
-								<td>+115 , -47</td>                                                                                                                                                                                                                                                                                                        
+									<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+									<td>1210</td>                                                                                                                                                                                                                                                                                                              
+									<td>+113 , -54</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
-								<td>1210</td>                                                                                                                                                                                                                                                                                                              
-								<td>+113 , -54</td>                                                                                                                                                                                                                                                                                                        
+									<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
+									<td>1206</td>                                                                                                                                                                                                                                                                                                              
+									<td>+111 , -56</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
-								<td>1151</td>                                                                                                                                                                                                                                                                                                              
-								<td>+0 , -0</td>                                                                                                                                                                                                                                                                                                           
+									<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
+									<td>1151</td>                                                                                                                                                                                                                                                                                                              
+									<td class="red">N/A</td>                                                                                                                                                                                                                                                                                                           
 								</tr>                                                                                                                                                                                                                                                                                                                      
 							</table>
 							<table style="font-size:0.4em;">
 								<tr><th></th><th></th><th>VBT</th></tr>
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<th>Run</th>                                                                                                                                                                                                                                                                                                               
-								<th>Solved</th>                                                                                                                                                                                                                                                                                                            
-								<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                    
+									<th>Run</th>                                                                                                                                                                                                                                                                                                               
+									<th>Solved</th>                                                                                                                                                                                                                                                                                                            
+									<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                    
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
-								<td>3046</td>                                                                                                                                                                                                                                                                                                              
-								<td>+474 , -65</td>                                                                                                                                                                                                                                                                                                        
+									<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+									<td>2841</td>                                                                                                                                                                                                                                                                                                              
+									<td>+269 , &nbsp;-&nbsp;65</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
-								<td>2916</td>                                                                                                                                                                                                                                                                                                              
-								<td>+379 , -100</td>                                                                                                                                                                                                                                                                                                       
+									<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
+									<td>2813</td>                                                                                                                                                                                                                                                                                                              
+									<td>+285 , -109</td>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
-								<td>2841</td>                                                                                                                                                                                                                                                                                                              
-								<td>+269 , -65</td>                                                                                                                                                                                                                                                                                                        
+									<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
+									<td>2724</td>                                                                                                                                                                                                                                                                                                              
+									<td>+218 , -143</td>                                                                                                                                                                                                                                                                                                       
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
-								<td>2804</td>                                                                                                                                                                                                                                                                                                              
-								<td>+285 , -118</td>                                                                                                                                                                                                                                                                                                       
-								</tr>                                                                                                                                                                                                                                                                                                                      
-								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
-								<td>2701</td>                                                                                                                                                                                                                                                                                                              
-								<td>+215 , -151</td>                                                                                                                                                                                                                                                                                                       
+									<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+									<td>2701</td>                                                                                                                                                                                                                                                                                                              
+									<td>+215 , -151</td>                                                                                                                                                                                                                                                                                                       
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                  
-								<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
-								<td>2637</td>                                                                                                                                                                                                                                                                                                              
-								<td>+0 , -0</td>                                                                                                                                                                                                                                                                                                           
+									<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
+									<td>2637</td>                                                                                                                                                                                                                                                                                                              
+									<td class="red">N/A</td>                                                                                                                                                                                                                                                                                                           
+								</tr>
+								<tr>                                                                                                                                                                                                                                                                                                                       
+									<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+									<td>2631</td>                                                                                                                                                                                                                                                                                                              
+									<td>+160 , -179</td>                                                                                                                                                                                                                                                                                                       
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								</table>         
 						</div><br>
@@ -925,19 +918,14 @@ Example "heuristic" in RL mode
 									<td>+493 , -146</td>
 								</tr>
 								<tr>
-									<td>ConstCatDistilled</td>
-									<td>3728</td>
-									<td>+500 , -168</td>
+									<td class="learningBased">ConstCat</td>
+									<td>3686</td>
+									<td>+471 , -188</td>
 								</tr>
 								<tr>
 									<td class="learningBased">NeuralNet</td>
-									<td>3676</td>
-									<td>+473 , -193</td>
-								</tr>
-								<tr>
-									<td class="learningBased">ConstCat</td>
-									<td>3676</td>
-									<td>+469 , -189</td>
+									<td>3686</td>
+									<td>+449 , -193</td>
 								</tr>
 								<tr>
 									<td>MasterAllOnes</td>
@@ -945,9 +933,14 @@ Example "heuristic" in RL mode
 									<td>+457 , -211</td>
 								</tr>
 								<tr>
+									<td>ConstCatDistilled</td>
+									<td>3510</td>
+									<td>+426 , -312</td>
+								</tr>
+								<tr>
 									<td><span class='term'>--auto</span></td>
 									<td>3396</td>
-									<td>+0 , -0</td>
+									<td class="red">N/A</td>
 								</tr>
 							</table>
 							<ul class="smallestfont" style="width:47%;margin-left:4%;">
@@ -979,78 +972,78 @@ Example "heuristic" in RL mode
 							<tr><th></th><th></th><th>MPTPTP2078</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Given Clauses</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Given Clauses</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>106.00</td>
-								<td>-3590.75</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>88</td>
+									<td>-3846</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>108.00</td>
-								<td>-3564.56</td>
+									<td class="learningBased">ConstCat</td>
+									<td>108</td>
+									<td>-3754</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>111.00</td>
-								<td>-3623.32</td>
+									<td>MasterAllOnes</td>
+									<td>109</td>
+									<td>-3623</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>130.00</td>
-								<td>-3182.97</td>
+									<td><span class='term'>--auto</span></td>
+									<td>128</td>
+									<td class="red">N/A</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>131.00</td>
-								<td>0.00</td>
+									<td>MasterWeighted</td>
+									<td>130</td>
+									<td>-3183</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>138.00</td>
-								<td>-3433.95</td>
+									<td>ConstCatDistilled</td>
+									<td>134</td>
+									<td>-3513</td>
 								</tr>
 							</table>
 							<table style="font-size:0.4em;">
 							<tr><th></th><th></th><th>VBT</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Given Clauses</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Given Clauses</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>1535.00</td>
-								<td>-519.26</td>
+									<td>ConstCatDistilled</td>
+									<td>1522</td>
+									<td>-661</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>1565.50</td>
-								<td>-596.00</td>
+									<td>MasterAllOnes</td>
+									<td>1550</td>
+									<td>-596</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>1566.00</td>
-								<td>-593.85</td>
+									<td class="learningBased">ConstCat</td>
+									<td>1574</td>
+									<td>-649</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>1646.00</td>
-								<td>-516.44</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>1581</td>
+									<td>-547</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>1722.00</td>
-								<td>-422.24</td>
+									<td>MasterWeighted</td>
+									<td>1679</td>
+									<td>-422</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>1927.00</td>
-								<td>0.00</td>
+									<td><span class='term'>--auto</span></td>
+									<td>1896</td>
+									<td class="red">N/A</td>
 								</tr>
 							</table>
 						</div><br>
@@ -1060,45 +1053,45 @@ Example "heuristic" in RL mode
 								<tr><th></th><th></th><th>SLH-29</th></tr>
 	
 								<tr>
-								<th>Run</th>
-								<th>Given Clauses</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Given Clauses</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>811.50</td>
-								<td>-2247.36</td>
+									<td>MasterWeighted</td>
+									<td>808</td>
+									<td>-2247</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>879.00</td>
-								<td>-1778.16</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>850</td>
+									<td>-1822</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>939.00</td>
-								<td>-1710.15</td>
+									<td>ConstCatDistilled</td>
+									<td>903</td>
+									<td>-1855</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>940.50</td>
-								<td>-1768.82</td>
+									<td class="learningBased">ConstCat</td>
+									<td>911</td>
+									<td>-1810</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>946.00</td>
-								<td>-1731.68</td>
+									<td>MasterAllOnes</td>
+									<td>933</td>
+									<td>-1769</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>1548.00</td>
-								<td>0.00</td>
+									<td><span class='term'>--auto</span></td>
+									<td>1550</td>
+									<td class="red">N/A</td>
 								</tr>
 							</table>
 							
 							<ul class="smallestfont" style="width:47%;margin-left:4%;">
 								<li class="fragment smallerfont">Learning-based approaches require fewer given clauses for <span class="green">MPTPTP2078</span></li>
-								<li class="fragment smallerfont">Fewer given clauses required by <em>all</em> methods for <span class="green">MPTPTP2078</span></li>
+								<!-- <li class="fragment smallerfont">Fewer given clauses required by <em>all</em> methods for <span class="green">MPTPTP2078</span></li> -->
 								<li class="fragment smallerfont">Indicates intelligent proof search! 🎉</li>
                         <li class="fragment smallerfont">Finding proofs faster makes users happy 🎉</li>
 							</ul>
@@ -1116,78 +1109,78 @@ Example "heuristic" in RL mode
 							<tr><th></th><th></th><th>MPTPTP2078</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Generated</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Generated</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>195.00</td>
-								<td>-41430.33</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>160</td>
+									<td>-43572</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>199.50</td>
-								<td>-40210.44</td>
+									<td class="learningBased">ConstCat</td>
+									<td>194</td>
+									<td>-40698</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>202.00</td>
-								<td>-39402.15</td>
+									<td>MasterAllOnes</td>
+									<td>199</td>
+									<td>-40210</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>230.00</td>
-								<td>-37017.26</td>
+									<td>MasterWeighted</td>
+									<td>229</td>
+									<td>-37017</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>254.00</td>
-								<td>0.00</td>
+									<td><span class='term'>--auto</span></td>
+									<td>242</td>
+									<td class="red">N/A</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>306.00</td>
-								<td>-40216.47</td>
+									<td>ConstCatDistilled</td>
+									<td>316</td>
+									<td>-41679</td>
 								</tr>
 							</table>
 							<table style="font-size:0.4em;">
 							<tr><th></th><th></th><th>VBT</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Generated</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Generated</th>
+								<th>vs	 <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>4752.00</td>
-								<td>1957.39</td>
+									<td>MasterAllOnes</td>
+									<td>4732</td>
+									<td>-2306</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>4767.00</td>
-								<td>-2306.29</td>
+									<td>ConstCatDistilled</td>
+									<td>5147</td>
+									<td>-2167</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>4805.00</td>
-								<td>-865.66</td>
+									<td class="learningBased">ConstCat</td>
+									<td>5719</td>
+									<td>247</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>5317.00</td>
-								<td>668.75</td>
+									<td>MasterWeighted</td>
+									<td>6475</td>
+									<td>-1</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>6764.50</td>
-								<td>-1.01</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>7193</td>
+									<td>1016</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>8783.00</td>
-								<td>0.00</td>
+									<td><span class='term'>--auto</span></td>
+									<td>8191</td>
+									<td class="red">N/A</td>
 								</tr>
 							</table>
 						</div><br>
@@ -1197,39 +1190,39 @@ Example "heuristic" in RL mode
 								<tr><th></th><th></th><th>SLH-29</th></tr>
 	
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<th>Run</th>                                                                                                                                                                                                                                                                                                               
-								<th>Generated</th>                                                                                                                                                                                                                                                                                                         
-								<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                 
+									<th>Run</th>                                                                                                                                                                                                                                                                                                               
+									<th>Generated</th>                                                                                                                                                                                                                                                                                                         
+									<th>vs <span class='term'>--auto</span></th>                                                                                                                                                                                                                                                                                                 
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
-								<td>1651.00</td>                                                                                                                                                                                                                                                                                                           
-								<td>-31346.46</td>                                                                                                                                                                                                                                                                                                         
+									<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+									<td>1636</td>                                                                                                                                                                                                                                                                                                           
+									<td>-31346</td>                                                                                                                                                                                                                                                                                                         
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
-								<td>1814.50</td>                                                                                                                                                                                                                                                                                                           
-								<td>-23891.08</td>                                                                                                                                                                                                                                                                                                         
-								</tr>                                                                                                                                                                                                                                                                                                                      
+									<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+									<td>1793</td>                                                                                                                                                                                                                                                                                                           
+									<td>-23796</td>                                                                                                                                                                                                                                                                                                         
+								</tr>
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
-								<td>1868.00</td>                                                                                                                                                                                                                                                                                                           
-								<td>-22696.30</td>                                                                                                                                                                                                                                                                                                         
+									<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+									<td>1802</td>                                                                                                                                                                                                                                                                                                           
+									<td>-23891</td>                                                                                                                                                                                                                                                                                                         
+								</tr>                                                                                                                                                                                                                                                                                                                      
+								<tr>
+									<td class="learningBased">ConstCat</td>
+									<td>1975</td>
+									<td>-22190</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>1913.50</td>
-								<td>-23089.69</td>
+									<td>ConstCatDistilled</td>
+									<td>2028</td>
+									<td>-24429</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>1955.00</td>
-								<td>-20843.68</td>
-								</tr>
-								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>3930.00</td>
-								<td>0.00</td>
+									<td><span class='term'>--auto</span></td>
+									<td>3990</td>
+									<td class="red">N/A</td>
 								</tr>
 							</table>
 
@@ -1255,78 +1248,78 @@ Example "heuristic" in RL mode
 							<tr><th></th><th></th><th>MPTPTP2078</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Proof Clauses</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Proof Clauses</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>23.00</td>
-								<td>0.00</td>
+									<td><span class='term'>--auto</span></td>
+									<td>23</td>
+									<td class="red">N/A</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>26.00</td>
-								<td>0.54</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>26</td>
+									<td>0.30</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>26.00</td>
-								<td>0.64</td>
+									<td class="learningBased">ConstCat</td>
+									<td>26</td>
+									<td>0.55</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>26.00</td>
-								<td>0.68</td>
+									<td>ConstCatDistilled</td>
+									<td>26</td>
+									<td>0.62</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>26.00</td>
-								<td>0.73</td>
+									<td>MasterAllOnes</td>
+									<td>26</td>
+									<td>0.68</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>26.00</td>
-								<td>0.73</td>
+									<td>MasterWeighted</td>
+									<td>26</td>
+									<td>0.73</td>
 								</tr>
 							</table>
 							<table style="font-size:0.4em;">
 							<tr><th></th><th></th><th>VBT</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Proof Clauses</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Proof Clauses</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>12.00</td>
-								<td>-0.22</td>
+									<td>ConstCatDistilled</td>
+									<td>12</td>
+									<td>-0.22</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>12.00</td>
-								<td>-0.19</td>
+									<td>MasterAllOnes</td>
+									<td>12</td>
+									<td>-0.10</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>12.00</td>
-								<td>-0.12</td>
+									<td><span class='term'>--auto</span></td>
+									<td>13</td>
+									<td class="red">N/A</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>12.00</td>
-								<td>-0.10</td>
+									<td class="learningBased">ConstCat</td>
+									<td>13</td>
+									<td>0.13</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>13.00</td>
-								<td>0.00</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>12</td>
+									<td>0.14</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>13.00</td>
-								<td>0.30</td>
+									<td>MasterWeighted</td>
+									<td>12</td>
+									<td>0.30</td>
 								</tr>
 							</table>
 						</div><br>
@@ -1335,39 +1328,39 @@ Example "heuristic" in RL mode
 							<table style="font-size:0.4em;">
 								<tr><th></th><th></th><th>SLH-29</th></tr>
 								<tr>
-								<th>Run</th>
-								<th>Proof Clauses</th>
-								<th>vs <span class='term'>--auto</span></th>
+									<th>Run</th>
+									<th>Proof Clauses</th>
+									<th>vs <span class='term'>--auto</span></th>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>11.00</td>
-								<td>0.00</td>
+									<td><span class='term'>--auto</span></td>
+									<td>11</td>
+									<td class="red">N/A</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>11.00</td>
-								<td>0.08</td>
+									<td>MasterWeighted</td>
+									<td>11</td>
+									<td>0.08</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>11.00</td>
-								<td>0.47</td>
+									<td>ConstCatDistilled</td>
+									<td>11</td>
+									<td>0.33</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>11.00</td>
-								<td>0.56</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>11</td>
+									<td>0.53</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>11.00</td>
-								<td>0.60</td>
+									<td>MasterAllOnes</td>
+									<td>11</td>
+									<td>0.56</td>
 								</tr>
 								<tr>
 								<td class="learningBased">ConstCat</td>
-								<td>11.00</td>
-								<td>0.75</td>
+								<td>11</td>
+									<td>0.68</td>
 								</tr>
 							</table>
 
@@ -1390,32 +1383,32 @@ Example "heuristic" in RL mode
 							<tr><th></th><th>MPTPTP2078</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Efficiency</th>
+									<th>Run</th>
+									<th>Efficiency</th>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>0.2803</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>0.337</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>0.2770</td>
+									<td class="learningBased">ConstCat</td>
+									<td>0.286</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>0.2699</td>
+									<td>MasterAllOnes</td>
+									<td>0.279</td>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>0.2373</td>
+									<td>MasterWeighted</td>
+									<td>0.239</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>0.2264</td>
+									<td>ConstCatDistilled</td>
+									<td>0.224</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>0.1926</td>
+									<td><span class='term'>--auto</span></td>
+									<td>0.194</td>
 								</tr>
 							</table>
 
@@ -1423,32 +1416,32 @@ Example "heuristic" in RL mode
 							<tr><th></th><th>VBT</th></tr>
 
 								<tr>
-								<th>Run</th>
-								<th>Efficiency</th>
+									<th>Run</th>
+									<th>Efficiency</th>
 								</tr>
 								<tr>
-								<td>MasterWeighted</td>
-								<td>0.0113</td>
+									<td>MasterAllOnes</td>
+									<td>0.011</td>
 								</tr>
 								<tr>
-								<td>MasterAllOnes</td>
-								<td>0.0111</td>
+									<td>MasterWeighted</td>
+									<td>0.011</td>
 								</tr>
 								<tr>
-								<td>ConstCatDistilled</td>
-								<td>0.0109</td>
+									<td class="learningBased">NeuralNet</td>
+									<td>0.011</td>
 								</tr>
 								<tr>
-								<td class="learningBased">ConstCat</td>
-								<td>0.0108</td>
+									<td>ConstCatDistilled</td>
+									<td>0.011</td>
 								</tr>
 								<tr>
-								<td class="learningBased">NeuralNet</td>
-								<td>0.0099</td>
+									<td class="learningBased">ConstCat</td>
+									<td>0.011</td>
 								</tr>
 								<tr>
-								<td><span class='term'>--auto</span></td>
-								<td>0.0091</td>
+									<td><span class='term'>--auto</span></td>
+									<td>0.009</td>
 								</tr>
 							</table>
 						</div><br>
@@ -1458,32 +1451,32 @@ Example "heuristic" in RL mode
 								<tr><th></th><th>SLH-29</th></tr>
 	
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<th>Run</th>                                                                                                                                                                                                                                                                                                               
-								<th>Efficiency</th>                                                                                                                                                                                                                                                                                                        
+									<th>Run</th>                                                                                                                                                                                                                                                                                                               
+									<th>Efficiency</th>                                                                                                                                                                                                                                                                                                        
 								</tr>                                                                                                                                                                                                                                                                                                                      
 								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
-								<td>0.0181</td>                                                                                                                                                                                                                                                                                                       
-								</tr>                                                                                                                                                                                                                                                                                                                      
-								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
-								<td>0.0178</td>                                                                                                                                                                                                                                                                                                       
-								</tr>                                                                                                                                                                                                                                                                                                                      
-								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
-								<td>0.0170</td>                                                                                                                                                                                                                                                                                                       
-								</tr>                                                                                                                                                                                                                                                                                                                      
-								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
-								<td>0.0166</td>                                                                                                                                                                                                                                                                                                       
-								</tr>                                                                                                                                                                                                                                                                                                                      
-								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
-								<td>0.0166</td>                                                                                                                                                                                                                                                                                                       
-								</tr>                                                                                                                                                                                                                                                                                                                      
-								<tr>                                                                                                                                                                                                                                                                                                                       
-								<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
-								<td>0.0095</td>                                                                                                                                                                                                                                                                                                       
+									<td class="learningBased">NeuralNet</td>                                                                                                                                                                                                                                                                                                             
+									<td>0.018</td>                                                                                                                                                                                                                                                                                                       
+								</tr>
+								<tr>
+									<td>MasterWeighted</td>                                                                                                                                                                                                                                                                                                     
+									<td>0.018</td>                                                                                                                                                                                                                                                                                                       
+								</tr>
+								<tr>
+									<td class="learningBased">ConstCat</td>                                                                                                                                                                                                                                                                                                       
+									<td>0.017</td>                                                                                                                                                                                                                                                                                                       
+								</tr>
+								<tr>
+									<td>MasterAllOnes</td>                                                                                                                                                                                                                                                                                              
+									<td>0.017</td>                                                                                                                                                                                                                                                                                                       
+								</tr>
+								<tr>
+									<td>ConstCatDistilled</td>                                                                                                                                                                                                                                                                                       
+									<td>0.017</td>                                                                                                                                                                                                                                                                                                       
+								</tr>
+								<tr>
+									<td><span class='term'>--auto</span></td>                                                                                                                                                                                                                                                                                                           
+									<td>0.010</td>                                                                                                                                                                                                                                                                                                       
 								</tr>                                                                                                                                                                                                                                                                                                                      
 							</table> 
 							<ul class="smallestfont" style="width:47%;margin-left:4%;">
@@ -1510,7 +1503,7 @@ Example "heuristic" in RL mode
 								</ul>
 							</li>
 							<li class="fragment"><span class="green">Distilled ConstCat</span> beats <span class="green">ConstCat</span> and <span class="green">NeuralNet</span> on <span class="red">SLH-29</span> and <span class="red">VBT</span>, but not <span class="red">MPTPTP2078</span></li>
-							<li class="fragment"><span class="green">MasterWeighted</span> beats everything for <span class="red">SLH-29</span></li>
+							<li class="fragment"><span class="green">MasterWeighted</span> beats everything for <span class="red">SLH-29</span> and <span class="red">VBT</span></li>
 
 						</ul>
 					</section>
@@ -1872,7 +1865,7 @@ Example "heuristic" in RL mode
 								<span class="fragment"><span class="yellow term">--auto</span> $>$ </span>
 								<span class="fragment"><span class="red">CommonElse</span></span>
 							</li>
-							<li class="fragment"><span class="green">AutoAll</span> $>>$ <span class="red">Everything</span> (as expected)</li>
+							<li class="fragment"><span class="green">AutoAll</span> $>>$ <span class="red">Everything</span> (as might be expected)</li>
 						</ul>
 					</section>
 
@@ -1881,7 +1874,7 @@ Example "heuristic" in RL mode
 						<ul class="smallerfont">
 							<li class="fragment">Standalone Python program that calls E, handling incremental merging automatically.</li>
 							<li class="fragment">Can also perform non-incremental merging</li>
-                     <li class="fragment">Being integrated into Isabelle / Sledgehammer</li>
+							<li class="fragment">Being integrated into Isabelle / Sledgehammer</li>
 							<li class="fragment"><a href="https://github.com/jackeown/IncrementalEWrapper">https://github.com/jackeown/IncrementalEWrapper</a></li>
 						</ul>
 						
@@ -1958,15 +1951,22 @@ Example "heuristic" in RL mode
 
 
             <section>
-               <h3>Publications and Submitted Papers</h3>
+            	<h3>Conclusions and Publications</h3>
 
-               <ul class="smallestfont">
-                  <li class="fragment">Reinforcement Learning in E - <span class="yellow">AITP 2022</span></li>
-                  <li class="fragment">Reinforcement Learning for Guiding the E Theorem Prover - <span class="yellow">FLAIRS 2023</span></li>
-                  <li class="fragment">Adaptive Strategy Curation for the E Theorem Prover - <span class="yellow">IJAIT in progress</span></li>
-                  <li class="fragment"><a href="https://scholar.google.com/citations?user=PdLO8A8AAAAJ">https://scholar.google.com/citations?user=PdLO8A8AAAAJ</a></li>
-               </ul>
-
+				<span class="smallestfont yellow fragment" style="display:flex; text-align:left;">Main Research Contributions</span>
+				<ol class="smallestfont box fragment" style="font-size:0.5em;padding-left:2em; width:800px;">
+					<li class="fragment smallfont">Novel RL approach to GCS selects CEFs <span class="green">(fewer heuristic evaluations)</span></li>
+					<li class="fragment smallfont">More proofs with fewer clause selections indicates intelligent search <span class="green">(on MPTPTP2078)</span></li>
+					<li class="fragment smallfont">Strategy merging is effective and is being implemented in Isabelle</li>
+				</ol>
+				<hr class="fragment">
+				<span class="smallestfont yellow fragment" style="display:flex; text-align:left;">Publications</span>
+				<ul class="smallestfont box fragment" style="font-size:0.5em;padding-left:2em; width:800px;">
+					<li class="fragment">Reinforcement Learning in E - <span class="yellow">AITP 2022</span></li>
+					<li class="fragment">Reinforcement Learning for Guiding the E Theorem Prover - <span class="yellow">FLAIRS 2023</span></li>
+					<li class="fragment">Adaptive Strategy Curation for the E Theorem Prover - <span class="yellow">IJAIT in progress</span></li>
+					<li class="fragment"><a href="https://scholar.google.com/citations?user=PdLO8A8AAAAJ">https://scholar.google.com/citations?user=PdLO8A8AAAAJ</a></li>
+				</ul>
 
             </section>
 
